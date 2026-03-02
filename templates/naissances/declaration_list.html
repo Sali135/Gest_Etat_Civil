@@ -1,0 +1,208 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}Declarations{% endblock %}
+{% block page_title %}Declarations de naissance{% endblock %}
+{% block page_subtitle %}
+{% if user.role == 'HOPITAL' %}Declarations de {{ user.hopital.nom }}{% elif user.role == 'MAIRIE' %}Dossiers recus par
+{{ user.mairie.nom }}{% else %}Toutes les declarations{% endif %}
+{% endblock %}
+
+{% block header_actions %}
+{% if user.role == 'HOPITAL' or user.is_superuser %}
+<a href="{% url 'naissances:declaration_create' %}" class="btn btn-primary btn-sm">
+    <i class="bi bi-plus-circle-fill"></i> Nouvelle declaration
+</a>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<section class="hero-strip">
+    <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
+        <div>
+            <div class="hero-kicker">Registre Naissance</div>
+            <h2 class="hero-title">Recherche et suivi des declarations</h2>
+            <p class="hero-meta">Filtrez rapidement les dossiers et accedez aux actions de traitement en un clic.</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <span class="glass-chip"><i class="bi bi-funnel-fill"></i>Filtres avances</span>
+            <span class="glass-chip"><i class="bi bi-shield-check"></i>Acces par role</span>
+        </div>
+    </div>
+</section>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-5">
+                <label class="form-label">Rechercher</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" name="q" value="{{ search }}" class="form-control"
+                        placeholder="Reference, nom enfant, pere, mere...">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Statut</label>
+                <select name="statut" class="form-select">
+                    <option value="">Tous les statuts</option>
+                    {% for value, label in statut_choices %}
+                    <option value="{{ value }}" {% if statut_filter == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-funnel-fill me-1"></i>Filtrer
+                </button>
+            </div>
+            <div class="col-md-2">
+                <a href="{% url 'naissances:declaration_list' %}" class="btn btn-outline-secondary w-100">
+                    <i class="bi bi-x-circle me-1"></i>Reinitialiser
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5><i class="bi bi-file-earmark-text-fill me-2"></i>
+            {{ declarations|length }} declaration{{ declarations|length|pluralize }}
+        </h5>
+    </div>
+    <div class="card-body p-0">
+        {% if declarations %}
+        <div class="table-shell">
+            <table class="table-modern w-100">
+                <thead>
+                    <tr>
+                        <th>Reference</th>
+                        <th>Enfant</th>
+                        <th>Date naissance</th>
+                        <th>Pere / Mere</th>
+                        <th>Hopital</th>
+                        <th>Mairie</th>
+                        <th>Statut</th>
+                        <th>Cree le</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in declarations %}
+                    <tr>
+                        <td><span class="ref-code">{{ d.reference }}</span></td>
+                        <td>
+                            <span class="fw-semibold">{{ d.nom_complet_enfant }}</span>
+                            <br><small class="text-soft">{{ d.get_sexe_display }} &middot; {{
+                                d.date_naissance|date:"d/m/Y" }}</small>
+                        </td>
+                        <td>{{ d.date_naissance|date:"d/m/Y" }}</td>
+                        <td>
+                            <div class="text-soft">
+                                <div>Pere: {{ d.nom_pere|truncatechars:25 }}</div>
+                                <div>Mere: {{ d.nom_mere|truncatechars:25 }}</div>
+                            </div>
+                        </td>
+                        <td><span class="text-soft">{{ d.hopital.nom|truncatechars:20 }}</span></td>
+                        <td><span class="text-soft">{{ d.mairie.nom|truncatechars:20 }}</span></td>
+                        <td>
+                            {% if d.statut == 'EN_ATTENTE' %}
+                            <span class="badge-status en-attente">En attente</span>
+                            {% elif d.statut == 'VALIDE' %}
+                            <span class="badge-status valide">Validee</span>
+                            {% else %}
+                            <span class="badge-status rejete">Rejetee</span>
+                            {% endif %}
+                        </td>
+                        <td><span class="text-soft">{{ d.date_creation|date:"d/m/Y" }}</span></td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <a href="{% url 'naissances:declaration_detail' d.pk %}"
+                                    class="btn btn-outline-secondary btn-sm" title="Voir le detail">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                {% if d.statut == 'EN_ATTENTE' %}
+                                {% if user.role == 'HOPITAL' %}
+                                {% if d.hopital == user.hopital %}
+                                <a href="{% url 'naissances:declaration_edit' d.pk %}"
+                                    class="btn btn-outline-secondary btn-sm" title="Modifier">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                {% endif %}
+                                {% endif %}
+                                {% endif %}
+                                {% if d.statut == 'VALIDE' %}
+                                {% with acte=d.acte %}
+                                {% if acte %}
+                                <a href="{% url 'naissances:telecharger_pdf' acte.pk %}" class="btn btn-success btn-sm"
+                                    title="Telecharger PDF">
+                                    <i class="bi bi-file-pdf-fill"></i>
+                                </a>
+                                {% endif %}
+                                {% endwith %}
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">&#128269;</div>
+            <h5>Aucune declaration trouvee</h5>
+            {% if user.role == 'HOPITAL' %}
+            <p>Creez votre premiere declaration de naissance.</p>
+            <a href="{% url 'naissances:declaration_create' %}" class="btn btn-primary mt-2">
+                <i class="bi bi-plus-circle-fill me-1"></i>Nouvelle declaration
+            </a>
+            {% else %}
+            <p>Aucun dossier recu pour le moment.</p>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- ─── Pagination ─── -->
+    {% if page_obj.paginator.num_pages > 1 %}
+    <div class="d-flex align-items-center justify-content-between mt-4 flex-wrap gap-2 px-3 pb-3">
+        <div class="metric-meta">
+            Déclarations <strong>{{ page_obj.start_index }}–{{ page_obj.end_index }}</strong>
+            sur <strong>{{ page_obj.paginator.count }}</strong>
+        </div>
+        <nav>
+            <ul class="pagination-custom">
+                {% if page_obj.has_previous %}
+                <li>
+                    <a href="?page={{ page_obj.previous_page_number }}&statut={{ statut_filter }}&q={{ search }}"
+                        class="page-btn">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <li><span class="page-btn active">{{ num }}</span></li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <li>
+                    <a href="?page={{ num }}&statut={{ statut_filter }}&q={{ search }}" class="page-btn">{{ num }}</a>
+                </li>
+                {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li>
+                    <a href="?page={{ page_obj.next_page_number }}&statut={{ statut_filter }}&q={{ search }}"
+                        class="page-btn">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+
+    {% endblock %}

@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}Décès{% endblock %}
+{% block page_title %}Déclarations de décès{% endblock %}
+{% block page_subtitle %}Gestion des actes de décès{% endblock %}
+
+{% block header_actions %}
+<a href="{% url 'naissances:deces_create' %}" class="btn btn-primary btn-sm">
+    <i class="bi bi-plus-circle-fill"></i> Nouveau décès
+</a>
+{% endblock %}
+
+{% block content %}
+<section class="hero-strip">
+    <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
+        <div>
+            <div class="hero-kicker">Registre Deces</div>
+            <h2 class="hero-title">Suivi des declarations de deces</h2>
+            <p class="hero-meta">Consultez les dossiers, priorisez le traitement et suivez la publication des actes.</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <span class="glass-chip"><i class="bi bi-file-earmark-x-fill"></i>Actes deces</span>
+            <span class="glass-chip"><i class="bi bi-alarm-fill"></i>Suivi des retards</span>
+        </div>
+    </div>
+</section>
+
+<div class="card">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-6">
+                <label class="form-label">Rechercher</label>
+                <input type="text" name="q" value="{{ search }}" class="form-control"
+                    placeholder="Référence, nom du défunt...">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Statut</label>
+                <select name="statut" class="form-select">
+                    <option value="">Tous</option>
+                    {% for value, label in statut_choices %}
+                    <option value="{{ value }}" {% if statut == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-search"></i> Filtrer
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5><i class="bi bi-file-earmark-x-fill me-2"></i>{{ declarations|length }} déclaration{{ declarations|length|pluralize }}</h5>
+    </div>
+    <div class="card-body p-0">
+        {% if declarations %}
+        <div class="table-shell">
+            <table class="table-modern w-100">
+                <thead>
+                    <tr>
+                        <th>Référence</th>
+                        <th>Défunt</th>
+                        <th>Date décès</th>
+                        <th>Lieu</th>
+                        <th>Mairie</th>
+                        <th>Statut</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in declarations %}
+                    <tr>
+                        <td><span class="ref-code">{{ d.reference }}</span></td>
+                        <td>{{ d.nom_complet_defunt }}</td>
+                        <td>{{ d.date_deces|date:"d/m/Y" }}</td>
+                        <td>{{ d.lieu_deces }}</td>
+                        <td>{{ d.mairie.nom }}</td>
+                        <td><span class="badge-status {{ d.statut|lower|cut:'_' }}">{{ d.get_statut_display }}</span></td>
+                        <td>
+                            <a href="{% url 'naissances:deces_detail' d.pk %}" class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">🕊️</div>
+            <h5>Aucune déclaration de décès</h5>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

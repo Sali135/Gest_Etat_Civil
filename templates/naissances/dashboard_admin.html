@@ -1,0 +1,302 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard Admin{% endblock %}
+{% block page_title %}Administration du systeme{% endblock %}
+{% block page_subtitle %}Vue d'ensemble du système de Gestion des actes d'etat civil{% endblock %}
+
+{% block header_actions %}
+<a href="/admin/" class="btn btn-primary btn-sm">
+    <i class="bi bi-shield-fill-check me-1"></i>Interface Admin
+</a>
+{% endblock %}
+
+{% block content %}
+<section class="hero-strip">
+    <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
+        <div>
+            <div class="hero-kicker">Vue Administration</div>
+            <h2 class="hero-title">Supervision globale du systeme</h2>
+            <p class="hero-meta">Controlez la performance des hopitaux et mairies avec une lecture immediate des indicateurs.</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <span class="glass-chip"><i class="bi bi-bar-chart-line"></i>Indicateurs consolides</span>
+            <span class="glass-chip"><i class="bi bi-diagram-3"></i>Vision multi-etablissements</span>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Row -->
+<div class="row g-4 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card primary">
+            <div class="stat-card-icon"><i class="bi bi-file-earmark-text-fill"></i></div>
+            <div class="stat-value">{{ stats.total }}</div>
+            <div class="stat-label">Total déclarations</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card warning">
+            <div class="stat-card-icon"><i class="bi bi-hourglass-split"></i></div>
+            <div class="stat-value">{{ stats.en_attente }}</div>
+            <div class="stat-label">En attente</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card success">
+            <div class="stat-card-icon"><i class="bi bi-check-circle-fill"></i></div>
+            <div class="stat-value">{{ stats.valides }}</div>
+            <div class="stat-label">Validées</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card danger">
+            <div class="stat-card-icon"><i class="bi bi-x-circle-fill"></i></div>
+            <div class="stat-value">{{ stats.rejetes }}</div>
+            <div class="stat-label">Rejetées</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card teal">
+            <div class="stat-card-icon"><i class="bi bi-hospital-fill"></i></div>
+            <div class="stat-value">{{ stats.hopitaux }}</div>
+            <div class="stat-label">Hôpitaux</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card info">
+            <div class="stat-card-icon"><i class="bi bi-building-fill"></i></div>
+            <div class="stat-value">{{ stats.mairies }}</div>
+            <div class="stat-label">Mairies</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card success">
+            <div class="stat-card-icon"><i class="bi bi-heart-fill"></i></div>
+            <div class="stat-value">{{ stats.mariages }}</div>
+            <div class="stat-label">Mariages</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card danger">
+            <div class="stat-card-icon"><i class="bi bi-file-earmark-x-fill"></i></div>
+            <div class="stat-value">{{ stats.deces }}</div>
+            <div class="stat-label">Décès</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card warning">
+            <div class="stat-card-icon"><i class="bi bi-alarm-fill"></i></div>
+            <div class="stat-value">{{ stats.en_retard }}</div>
+            <div class="stat-label">Naissances en retard</div>
+        </div>
+    </div>
+</div>
+
+<!-- ─── Charts Row ─── -->
+<div class="row g-4 mb-4">
+    <div class="col-lg-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5><i class="bi bi-pie-chart-fill me-2"></i>Repartition des statuts</h5>
+            </div>
+            <div class="card-body chart-holder">
+                <canvas id="donutChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5><i class="bi bi-bar-chart-fill me-2"></i>Performance par hopital</h5>
+            </div>
+            <div class="card-body chart-holder">
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Hospitals Stats -->
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5><i class="bi bi-hospital-fill me-2"></i>Activite par hopital</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if hopitaux_stats %}
+                <div class="table-shell">
+                <table class="table-modern w-100">
+                    <thead>
+                        <tr>
+                            <th>Hôpital</th>
+                            <th class="text-center">Déclarations</th>
+                            <th class="text-center">Validées</th>
+                            <th>Taux</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for h in hopitaux_stats %}
+                        <tr>
+                            <td class="table-emphasis">{{ h.nom }}</td>
+                            <td class="text-center">{{ h.nb_declarations }}</td>
+                            <td class="text-center table-positive">{{ h.nb_valides }}</td>
+                            <td>
+                                {% if h.nb_declarations > 0 %}
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="progress-bar-custom flex-grow-1">
+                                        <div class="progress-bar-fill progress-fill-success"
+                                            style="width:{% widthratio h.nb_valides h.nb_declarations 100 %}%;">
+                                        </div>
+                                    </div>
+                                    <span class="percent-soft">{% widthratio
+                                        h.nb_valides h.nb_declarations 100 %}%</span>
+                                </div>
+                                {% else %}—{% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon"></div>
+                    <h5>Aucun hôpital enregistré</h5>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Declarations -->
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5><i class="bi bi-clock-history me-2"></i>Activite recente</h5>
+                <a href="{% url 'naissances:declaration_list' %}" class="btn btn-outline-secondary btn-sm">Voir tout</a>
+            </div>
+            <div class="card-body p-0">
+                {% if recent %}
+                <div class="table-shell">
+                <table class="table-modern w-100">
+                    <thead>
+                        <tr>
+                            <th>Référence</th>
+                            <th>Enfant</th>
+                            <th>Statut</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for d in recent %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'naissances:declaration_detail' d.pk %}"
+                                    class="ref-code text-decoration-none">
+                                    {{ d.reference }}
+                                </a>
+                            </td>
+                            <td><span class="fw-semibold">{{ d.nom_enfant }}</span></td>
+                            <td>
+                                <span class="badge-status {{ d.statut|lower|cut:'_' }}">
+                                    {{ d.get_statut_display }}
+                                </span>
+                            </td>
+                            <td><span class="text-soft">{{ d.date_creation|date:"d/m/Y" }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">📋</div>
+                    <h5>Aucune déclaration</h5>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<script>
+    // ─── Donut Chart : Répartition des statuts ───
+    const donutCtx = document.getElementById('donutChart');
+    if (donutCtx) {
+        new Chart(donutCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['En attente', 'Validées', 'Rejetées'],
+                datasets: [{
+                    data: [{{ stats.en_attente }}, {{ stats.valides }}, {{ stats.rejetes }}],
+        backgroundColor: ['rgba(244,166,42,0.85)', 'rgba(31,159,111,0.85)', 'rgba(212,71,71,0.85)'],
+        borderColor: ['#f4a62a', '#1f9f6f', '#d44747'],
+            borderWidth: 2,
+                hoverOffset: 6,
+        }]
+      },
+    options: {
+        cutout: '68%',
+            responsive: true,
+                maintainAspectRatio: false,
+                    plugins: {
+            legend: { position: 'bottom', labels: { padding: 16, font: { family: 'Manrope', size: 12 } } },
+            tooltip: {
+                callbacks: {
+                    label: ctx => ` ${ctx.label} : ${ctx.parsed} déclaration(s)`
+                }
+            }
+        }
+    }
+    });
+  }
+
+    // ─── Bar Chart : Activité par hôpital ───
+    const barCtx = document.getElementById('barChart');
+    if (barCtx) {
+    const labels = [{% for h in hopitaux_stats %}'{{ h.nom|truncatechars:18 }}'{% if not forloop.last %}, {% endif %}{% endfor %}];
+    const totaux = [{% for h in hopitaux_stats %}{{ h.nb_declarations }}{% if not forloop.last %}, {% endif %}{% endfor %}];
+    const valides = [{% for h in hopitaux_stats %}{{ h.nb_valides }}{% if not forloop.last %}, {% endif %}{% endfor %}];
+
+    new Chart(barCtx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Déclarations',
+                    data: totaux,
+                    backgroundColor: 'rgba(27,70,106,0.8)',
+                    borderColor: '#3f5d4c',
+                    borderWidth: 1.5,
+                    borderRadius: 6,
+                },
+                {
+                    label: 'Validées',
+                    data: valides,
+                    backgroundColor: 'rgba(31,159,111,0.8)',
+                    borderColor: '#1f9f6f',
+                    borderWidth: 1.5,
+                    borderRadius: 6,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'top', labels: { font: { family: 'Manrope', size: 12 }, padding: 12 } }
+            },
+            scales: {
+                y: { beginAtZero: true, ticks: { precision: 0, font: { family: 'Manrope' } }, grid: { color: '#e8eddc' } },
+                x: { ticks: { font: { family: 'Manrope', size: 11 } }, grid: { display: false } }
+            }
+        }
+    });
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Modifier mairie{% endblock %}
+{% block page_title %}Modifier mairie{% endblock %}
+{% block page_subtitle %}{{ mairie.nom }}{% endblock %}
+
+{% block content %}
+<section class="hero-strip">
+    <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
+        <div>
+            <div class="hero-kicker">Edition Mairie</div>
+            <h2 class="hero-title">Mettre a jour les informations communales</h2>
+            <p class="hero-meta">Assurez la qualite des donnees de contact et l'exactitude territoriale.</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <span class="glass-chip"><i class="bi bi-building-gear"></i>Configuration locale</span>
+        </div>
+    </div>
+</section>
+
+<div class="form-section card-glow">
+    <div class="form-section-header">
+        <i class="bi bi-building-gear"></i>
+        <h6>Mise à jour de la mairie</h6>
+    </div>
+    <div class="form-section-body">
+        <form method="post" class="row g-3">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="col-md-6">
+                <label class="form-label">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                <div class="text-danger mt-1 field-error">{{ field.errors.0 }}</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+            <div class="col-12 d-flex justify-content-end gap-2 mt-2">
+                <a href="{% url 'accounts:admin_mairies' %}" class="btn btn-outline-secondary">Annuler</a>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Enregistrer</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

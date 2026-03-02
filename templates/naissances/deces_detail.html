@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ declaration.reference }}{% endblock %}
+{% block page_title %}Détail du décès{% endblock %}
+{% block page_subtitle %}{{ declaration.nom_complet_defunt }}{% endblock %}
+
+{% block header_actions %}
+<a href="{% url 'naissances:deces_list' %}" class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-arrow-left"></i> Retour
+</a>
+{% if acte and declaration.statut == 'VALIDE' %}
+<a href="{% url 'naissances:telecharger_deces_pdf' acte.pk %}" class="btn btn-success btn-sm">
+    <i class="bi bi-file-pdf-fill"></i> Télécharger acte
+</a>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<section class="hero-strip">
+    <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
+        <div>
+            <div class="hero-kicker">Dossier Deces</div>
+            <h2 class="hero-title">Suivi du dossier {{ declaration.reference }}</h2>
+            <p class="hero-meta">Centralisez les informations essentielles et sécurisez le traitement administratif.</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <span class="glass-chip"><i class="bi bi-file-earmark-x-fill"></i>Acte officiel</span>
+            <span class="glass-chip"><i class="bi bi-building-fill"></i>Validation mairie</span>
+        </div>
+    </div>
+</section>
+
+<div class="card status-banner mb-3">
+    <div class="card-body d-flex align-items-center justify-content-between">
+        <div>
+            <div class="info-label">Statut</div>
+            <span class="badge-status {{ declaration.statut|lower|cut:'_' }}">{{ declaration.get_statut_display }}</span>
+        </div>
+        {% if declaration.date_traitement %}
+        <div class="text-end">
+            <div class="info-label">Traité le</div>
+            <div class="fw-semibold">{{ declaration.date_traitement|date:"d/m/Y H:i" }}</div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="detail-section">
+    <div class="detail-section-header">Informations de l'acte de décès</div>
+    <div class="detail-grid">
+        <div class="detail-item"><div class="detail-item-label">Référence</div><div class="detail-item-value">{{ declaration.reference }}</div></div>
+        <div class="detail-item"><div class="detail-item-label">Numéro acte</div><div class="detail-item-value">{% if acte %}{{ acte.numero_acte }}{% else %}En attente{% endif %}</div></div>
+        <div class="detail-item"><div class="detail-item-label">Défunt</div><div class="detail-item-value">{{ declaration.nom_complet_defunt }}</div></div>
+        <div class="detail-item"><div class="detail-item-label">Sexe</div><div class="detail-item-value">{{ declaration.get_sexe_display }}</div></div>
+        <div class="detail-item"><div class="detail-item-label">Date décès</div><div class="detail-item-value">{{ declaration.date_deces|date:"d/m/Y" }}</div></div>
+        <div class="detail-item"><div class="detail-item-label">Lieu décès</div><div class="detail-item-value">{{ declaration.lieu_deces }}</div></div>
+        <div class="detail-item"><div class="detail-item-label">Déclarant</div><div class="detail-item-value">{{ declaration.declarant_nom }}</div></div>
+        <div class="detail-item"><div class="detail-item-label">Lien</div><div class="detail-item-value">{{ declaration.declarant_lien|default:"Non renseigné" }}</div></div>
+        <div class="detail-item detail-item-full"><div class="detail-item-label">Cause du décès</div><div class="detail-item-value">{{ declaration.cause_deces|default:"Non renseignée" }}</div></div>
+    </div>
+</div>
+
+{% if declaration.statut == 'REJETE' and declaration.motif_rejet %}
+<div class="alert alert-danger mt-3">
+    <i class="bi bi-x-circle-fill"></i>
+    <div><strong>Motif du rejet :</strong> {{ declaration.motif_rejet }}</div>
+</div>
+{% endif %}
+
+{% if can_process %}
+<div class="card action-panel card-glow mt-3">
+    <div class="card-header"><h6><i class="bi bi-gear-fill me-2"></i>Traitement mairie</h6></div>
+    <div class="card-body">
+        <form method="post" action="{% url 'naissances:deces_valider' declaration.pk %}" class="mb-3" data-status-action="valider" data-confirm-message="Confirmer la validation de cette declaration de deces ?">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-check-circle-fill"></i> Valider et générer l'acte
+            </button>
+        </form>
+        {% if declaration.statut == 'EN_ATTENTE' %}
+        <form method="post" action="{% url 'naissances:deces_verification' declaration.pk %}" class="mb-3" data-status-action="verification">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-secondary">
+                <i class="bi bi-search"></i> Passer en vérification
+            </button>
+        </form>
+        {% endif %}
+        <form method="post" action="{% url 'naissances:deces_rejeter' declaration.pk %}" data-status-action="rejeter" data-confirm-message="Confirmer le rejet de cette declaration de deces ?">
+            {% csrf_token %}
+            <div class="mb-2">{{ rejection_form.motif_rejet.label_tag }}{{ rejection_form.motif_rejet }}</div>
+            <button type="submit" class="btn btn-danger">
+                <i class="bi bi-x-circle-fill"></i> Rejeter
+            </button>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+{% if historique %}
+<div class="card card-glow mt-3">
+    <div class="card-header"><h6><i class="bi bi-clock-history me-2"></i>Historique</h6></div>
+    <div class="card-body p-0">
+        <div class="table-shell">
+            <table class="table-modern w-100">
+                <thead><tr><th>Date</th><th>Action</th><th>Statut</th><th>Utilisateur</th><th>Commentaire</th></tr></thead>
+                <tbody>
+                    {% for h in historique %}
+                    <tr>
+                        <td>{{ h.date_action|date:"d/m/Y H:i" }}</td>
+                        <td>{{ h.action }}</td>
+                        <td>{{ h.statut_avant }} {% if h.statut_apres %}&rarr; {{ h.statut_apres }}{% endif %}</td>
+                        <td>{{ h.utilisateur|default:"Systeme" }}</td>
+                        <td>{{ h.commentaire|default:"—" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action }} mariage{% endblock %}
+{% block page_title %}{{ action }} une déclaration de mariage{% endblock %}
+{% block page_subtitle %}Informations des époux et de la célébration{% endblock %}
+
+{% block content %}
+<section class="hero-strip">
+    <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
+        <div>
+            <div class="hero-kicker">Saisie Mariage</div>
+            <h2 class="hero-title">{{ action }} une declaration de mariage</h2>
+            <p class="hero-meta">Constituez un dossier complet pour validation municipale et emission de l'acte.</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <span class="glass-chip"><i class="bi bi-people-fill"></i>Identite des epoux</span>
+            <span class="glass-chip"><i class="bi bi-calendar-check-fill"></i>Date officielle</span>
+        </div>
+    </div>
+</section>
+
+<form method="post" class="d-grid gap-3">
+    {% csrf_token %}
+
+    <div class="form-section">
+        <div class="form-section-header"><i class="bi bi-person-fill"></i><h6>Époux</h6></div>
+        <div class="form-section-body">
+            <div class="row g-3">
+                <div class="col-md-6">{{ form.nom_epoux.label_tag }}{{ form.nom_epoux }}</div>
+                <div class="col-md-3">{{ form.date_naissance_epoux.label_tag }}{{ form.date_naissance_epoux }}</div>
+                <div class="col-md-3">{{ form.profession_epoux.label_tag }}{{ form.profession_epoux }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <div class="form-section-header"><i class="bi bi-person-heart"></i><h6>Épouse</h6></div>
+        <div class="form-section-body">
+            <div class="row g-3">
+                <div class="col-md-6">{{ form.nom_epouse.label_tag }}{{ form.nom_epouse }}</div>
+                <div class="col-md-3">{{ form.date_naissance_epouse.label_tag }}{{ form.date_naissance_epouse }}</div>
+                <div class="col-md-3">{{ form.profession_epouse.label_tag }}{{ form.profession_epouse }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <div class="form-section-header"><i class="bi bi-building"></i><h6>Célébration</h6></div>
+        <div class="form-section-body">
+            <div class="row g-3">
+                <div class="col-md-3">{{ form.date_mariage.label_tag }}{{ form.date_mariage }}</div>
+                <div class="col-md-5">{{ form.lieu_mariage.label_tag }}{{ form.lieu_mariage }}</div>
+                <div class="col-md-4">{{ form.mairie.label_tag }}{{ form.mairie }}</div>
+                <div class="col-md-6">{{ form.email_contact.label_tag }}{{ form.email_contact }}</div>
+                <div class="col-12">{{ form.temoins.label_tag }}{{ form.temoins }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2">
+        <a href="{% url 'naissances:mariage_list' %}" class="btn btn-outline-secondary">Annuler</a>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Enregistrer</button>
+    </div>
+</form>
+{% endblock %}

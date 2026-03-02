@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard Mariages{% endblock %}
+{% block page_title %}Tableau de bord Mariages{% endblock %}
+{% block page_subtitle %}Suivi des actes de mariage{% endblock %}
+
+{% block header_actions %}
+<a href="{% url 'naissances:mariage_create' %}" class="btn btn-primary btn-sm">
+    <i class="bi bi-plus-circle-fill"></i> Nouveau mariage
+</a>
+<a href="{% url 'naissances:mariage_list' %}" class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-list"></i> Liste complète
+</a>
+{% endblock %}
+
+{% block content %}
+<section class="hero-strip">
+    <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
+        <div>
+            <div class="hero-kicker">Etat Civil Mariage</div>
+            <h2 class="hero-title">Pilotage des unions et actes de mariage</h2>
+            <p class="hero-meta">Suivez les dossiers, accélérez la validation et gardez une traçabilité claire des décisions.</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <span class="glass-chip"><i class="bi bi-heart-fill"></i>Suivi des couples</span>
+            <span class="glass-chip"><i class="bi bi-building-fill"></i>Flux mairies</span>
+        </div>
+    </div>
+</section>
+
+<div class="row g-4">
+    <div class="col-sm-6 col-xl-4">
+        <div class="stat-card primary">
+            <div class="stat-card-icon"><i class="bi bi-heart-fill"></i></div>
+            <div class="stat-value">{{ stats.total }}</div>
+            <div class="stat-label">Total mariages</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-4">
+        <div class="stat-card success">
+            <div class="stat-card-icon"><i class="bi bi-calendar2-week-fill"></i></div>
+            <div class="stat-value">{{ stats.ce_mois }}</div>
+            <div class="stat-label">Ce mois</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-4">
+        <div class="stat-card info">
+            <div class="stat-card-icon"><i class="bi bi-people-fill"></i></div>
+            <div class="stat-value">{{ stats.avec_temoins }}</div>
+            <div class="stat-label">Avec témoins renseignés</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-4">
+        <div class="stat-card warning">
+            <div class="stat-card-icon"><i class="bi bi-hourglass-split"></i></div>
+            <div class="stat-value">{{ stats.en_attente }}</div>
+            <div class="stat-label">En attente</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-4">
+        <div class="stat-card success">
+            <div class="stat-card-icon"><i class="bi bi-check-circle-fill"></i></div>
+            <div class="stat-value">{{ stats.valides }}</div>
+            <div class="stat-label">Validés</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-4">
+        <div class="stat-card danger">
+            <div class="stat-card-icon"><i class="bi bi-x-circle-fill"></i></div>
+            <div class="stat-value">{{ stats.rejetes }}</div>
+            <div class="stat-label">Rejetés</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-4">
+        <div class="stat-card warning">
+            <div class="stat-card-icon"><i class="bi bi-alarm-fill"></i></div>
+            <div class="stat-value">{{ stats.en_retard }}</div>
+            <div class="stat-label">Dossiers en retard</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5><i class="bi bi-clock-history me-2"></i>Mariages récents</h5>
+    </div>
+    <div class="card-body p-0">
+        {% if recent %}
+        <div class="table-shell">
+            <table class="table-modern w-100">
+                <thead>
+                    <tr>
+                        <th>Référence</th>
+                        <th>Époux</th>
+                        <th>Épouse</th>
+                        <th>Date</th>
+                        <th>Mairie</th>
+                        <th>Statut</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in recent %}
+                    <tr>
+                        <td><a class="ref-code text-decoration-none" href="{% url 'naissances:mariage_detail' d.pk %}">{{ d.reference }}</a></td>
+                        <td>{{ d.nom_epoux }}</td>
+                        <td>{{ d.nom_epouse }}</td>
+                        <td>{{ d.date_mariage|date:"d/m/Y" }}</td>
+                        <td>{{ d.mairie.nom }}</td>
+                        <td>
+                            <span class="badge-status {{ d.statut|lower|cut:'_' }}">{{ d.get_statut_display }}</span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">💍</div>
+            <h5>Aucun mariage enregistré</h5>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

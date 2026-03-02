@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action }} décès{% endblock %}
+{% block page_title %}{{ action }} une déclaration de décès{% endblock %}
+{% block page_subtitle %}Informations du défunt et du déclarant{% endblock %}
+
+{% block content %}
+<section class="hero-strip">
+    <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
+        <div>
+            <div class="hero-kicker">Saisie Deces</div>
+            <h2 class="hero-title">{{ action }} une declaration de deces</h2>
+            <p class="hero-meta">Formalisez le dossier avec precision pour une delivrance rapide et conforme de l'acte.</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <span class="glass-chip"><i class="bi bi-file-earmark-text-fill"></i>Informations officielles</span>
+            <span class="glass-chip"><i class="bi bi-building-fill"></i>Traitement mairie</span>
+        </div>
+    </div>
+</section>
+
+<form method="post" class="d-grid gap-3">
+    {% csrf_token %}
+
+    <div class="form-section">
+        <div class="form-section-header"><i class="bi bi-person-fill"></i><h6>Défunt</h6></div>
+        <div class="form-section-body">
+            <div class="row g-3">
+                <div class="col-md-4">{{ form.nom_defunt.label_tag }}{{ form.nom_defunt }}</div>
+                <div class="col-md-4">{{ form.prenom_defunt.label_tag }}{{ form.prenom_defunt }}</div>
+                <div class="col-md-4">{{ form.sexe.label_tag }}{{ form.sexe }}</div>
+                <div class="col-md-4">{{ form.date_naissance.label_tag }}{{ form.date_naissance }}</div>
+                <div class="col-md-4">{{ form.date_deces.label_tag }}{{ form.date_deces }}</div>
+                <div class="col-md-4">{{ form.lieu_deces.label_tag }}{{ form.lieu_deces }}</div>
+                <div class="col-12">{{ form.cause_deces.label_tag }}{{ form.cause_deces }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <div class="form-section-header"><i class="bi bi-person-badge"></i><h6>Déclarant & administration</h6></div>
+        <div class="form-section-body">
+            <div class="row g-3">
+                <div class="col-md-4">{{ form.declarant_nom.label_tag }}{{ form.declarant_nom }}</div>
+                <div class="col-md-4">{{ form.declarant_lien.label_tag }}{{ form.declarant_lien }}</div>
+                <div class="col-md-4">{{ form.email_contact.label_tag }}{{ form.email_contact }}</div>
+                <div class="col-md-2">{{ form.hopital.label_tag }}{{ form.hopital }}</div>
+                <div class="col-md-2">{{ form.mairie.label_tag }}{{ form.mairie }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2">
+        <a href="{% url 'naissances:deces_list' %}" class="btn btn-outline-secondary">Annuler</a>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Enregistrer</button>
+    </div>
+</form>
+{% endblock %}

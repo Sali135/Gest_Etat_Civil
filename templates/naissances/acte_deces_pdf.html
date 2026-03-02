@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <!-- Encodage pour les caractères accentués -->
+    <meta charset="UTF-8">
+    <!-- Titre PDF dynamique avec numéro d'acte -->
+    <title>Acte de Décès {{ acte.numero_acte }}</title>
+    <style>
+        /* Paramètres de page PDF */
+        @page { size: A4; margin: 1.2cm 1.4cm 1.4cm 1.4cm; }
+
+        /* Base typographique du document */
+        body {
+            font-family: "Times New Roman", serif;
+            font-size: 11pt;
+            color: #111;
+            background: #f7f1e1;
+        }
+
+        /* Feuille administrative */
+        .doc {
+            border: 1px solid #9f957e;
+            background: #fbf6e6;
+            padding: 14px;
+        }
+
+        /* Ruban couleur Cameroun */
+        .ribbon {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 8px;
+        }
+        .ribbon td { height: 5px; }
+        .r-green { background: #0e5a35; }
+        .r-red { background: #b5212b; }
+        .r-yellow { background: #d7a100; }
+
+        /* En-tête principal */
+        .head {
+            text-align: center;
+            border-bottom: 2px double #111;
+            padding-bottom: 10px;
+            margin-bottom: 12px;
+        }
+        .head h1 {
+            margin: 5px 0;
+            font-size: 19pt;
+            text-transform: uppercase;
+        }
+        .head .sub { font-size: 10pt; }
+        .head .office {
+            margin-top: 3px;
+            font-size: 11.2pt;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        /* Méta-informations */
+        .meta {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+        .meta td {
+            border: 1px solid #c7bea8;
+            padding: 5px 7px;
+            font-size: 10.4pt;
+            background: #fffdf7;
+        }
+
+        /* Lignes d'information */
+        .row { margin: 8px 0; }
+        .label { font-weight: bold; }
+        .line {
+            border-bottom: 1px solid #111;
+            min-height: 18px;
+            padding: 1px 2px;
+            font-size: 11.2pt;
+        }
+
+        /* Signature bas de page */
+        .sign { margin-top: 26px; width: 100%; border-collapse: collapse; }
+        .sign td { width: 50%; text-align: center; vertical-align: top; }
+        .sign-cap { font-weight: bold; margin-bottom: 40px; font-size: 10pt; }
+        .sign-line { border-top: 1px solid #111; padding-top: 4px; font-size: 10pt; }
+    </style>
+</head>
+<body>
+    <!-- Conteneur document -->
+    <div class="doc">
+        <!-- Bandeau tricolore -->
+        <table class="ribbon">
+            <tr>
+                <td class="r-green"></td>
+                <td class="r-red"></td>
+                <td class="r-yellow"></td>
+            </tr>
+        </table>
+
+        <!-- En-tête de l'acte -->
+        <div class="head">
+            <div class="sub">République du Cameroun - Peace, Work, Fatherland</div>
+            <h1>Acte de Décès</h1>
+            <div class="office">Centre d'Etat Civil de {{ declaration.mairie.nom }}</div>
+            <div>N° {{ acte.numero_acte }} - Référence {{ declaration.reference }}</div>
+        </div>
+
+        <!-- Bloc méta -->
+        <table class="meta">
+            <tr>
+                <td><span class="label">Mairie émettrice :</span> {{ declaration.mairie.nom }}</td>
+                <td><span class="label">Date d'émission :</span> {{ acte.date_generation|date:"d/m/Y à H:i" }}</td>
+            </tr>
+        </table>
+
+        <!-- Données d'identité du défunt -->
+        <div class="row"><span class="label">Nom complet du défunt :</span></div>
+        <div class="line">{{ declaration.nom_complet_defunt }}</div>
+
+        <!-- Informations sur l'événement décès -->
+        <div class="row"><span class="label">Sexe :</span> {{ declaration.get_sexe_display }}</div>
+        <div class="row"><span class="label">Date de naissance :</span> {{ declaration.date_naissance|date:"d/m/Y"|default:"Non renseignée" }}</div>
+        <div class="row"><span class="label">Date du décès :</span> {{ declaration.date_deces|date:"d/m/Y" }}</div>
+        <div class="row"><span class="label">Lieu du décès :</span> {{ declaration.lieu_deces }}</div>
+        <div class="row"><span class="label">Cause du décès :</span></div>
+        <div class="line">{{ declaration.cause_deces|default:"Non renseignée" }}</div>
+        <div class="row"><span class="label">Déclarant :</span> {{ declaration.declarant_nom }}{% if declaration.declarant_lien %} ({{ declaration.declarant_lien }}){% endif %}</div>
+
+        <!-- Formule de clôture -->
+        <div class="row" style="margin-top:16px;">Fait et délivré pour servir et valoir ce que de droit.</div>
+
+        <!-- Signatures officielles -->
+        <table class="sign">
+            <tr>
+                <td>
+                    <div class="sign-cap">Le Secrétaire</div>
+                    <div class="sign-line">{{ declaration.agent_traitement.get_full_name|default:declaration.agent_traitement.username|default:"Nom et signature" }}</div>
+                </td>
+                <td>
+                    <div class="sign-cap">L'Officier d'État Civil</div>
+                    <div class="sign-line">{{ declaration.mairie.nom }}</div>
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>

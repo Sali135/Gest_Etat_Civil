@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Gest_EtatCivil{% endblock %} | Plateforme de Gestion des Naissances</title>
+  <meta name="description"
+    content="Plateforme numérique de gestion des déclarations de naissance entre hôpitaux et mairies.">
+  {% load static %}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- Custom CSS -->
+  <link href="{% static 'css/style.css' %}" rel="stylesheet">
+
+  {% block extra_css %}{% endblock %}
+</head>
+
+<body class="{% block body_class %}app-body page-entering{% endblock %}">
+  <!-- ─── Sidebar Overlay (mobile) ─── -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <div class="app-wrapper">
+
+    <!-- ─── Sidebar ─── -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-icon"><i class="bi bi-building-fill"></i></div>
+        <div class="sidebar-brand-text">
+          <h5>Gest_EtatCivil</h5>
+          <small>Etat Civil Mairies Cameroun</small>
+        </div>
+        <!-- Close button mobile -->
+        <button class="sidebar-close-btn d-md-none" id="sidebarClose" aria-label="Fermer le menu">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav">
+        {% if user.is_authenticated %}
+
+        <div class="sidebar-section-title">Navigation</div>
+
+        <a href="{% url 'naissances:dashboard' %}"
+          class="sidebar-link {% if 'dashboard' in request.resolver_match.url_name %}active{% endif %}">
+          <i class="bi bi-grid-1x2-fill"></i>
+          <span>Tableau de bord</span>
+        </a>
+
+        <a href="{% url 'naissances:declaration_list' %}"
+          class="sidebar-link {% if 'declaration_list' in request.resolver_match.url_name %}active{% endif %}">
+          <i class="bi bi-file-earmark-text-fill"></i>
+          <span>Déclarations</span>
+        </a>
+
+        <a href="{% url 'naissances:mariage_dashboard' %}"
+          class="sidebar-link {% if 'mariage_' in request.resolver_match.url_name %}active{% endif %}">
+          <i class="bi bi-heart-fill"></i>
+          <span>Mariages</span>
+        </a>
+
+        <a href="{% url 'naissances:deces_dashboard' %}"
+          class="sidebar-link {% if 'deces_' in request.resolver_match.url_name %}active{% endif %}">
+          <i class="bi bi-file-earmark-x-fill"></i>
+          <span>Décès</span>
+        </a>
+
+        {% if user.role == 'HOPITAL' or user.is_superuser %}
+        <a href="{% url 'naissances:declaration_create' %}"
+          class="sidebar-link {% if 'declaration_create' in request.resolver_match.url_name %}active{% endif %}">
+          <i class="bi bi-plus-circle-fill"></i>
+          <span>Nouvelle déclaration</span>
+        </a>
+        {% endif %}
+
+        <div class="sidebar-section-title">Accès public</div>
+        <a href="{% url 'naissances:parent_status' %}"
+          class="sidebar-link {% if 'parent_status' in request.resolver_match.url_name %}active{% endif %}">
+          <i class="bi bi-search"></i>
+          <span>Statut dossier</span>
+        </a>
+
+        {% if user.is_superuser or user.role == 'ADMIN' %}
+        <div class="sidebar-section-title">Administration</div>
+        <a href="{% url 'accounts:admin_users' %}" class="sidebar-link {% if 'admin_users' in request.resolver_match.url_name %}active{% endif %}">
+          <i class="bi bi-people-fill"></i>
+          <span>Utilisateurs</span>
+        </a>
+        <a href="{% url 'accounts:admin_mairies' %}" class="sidebar-link {% if 'admin_mairies' in request.resolver_match.url_name %}active{% endif %}">
+          <i class="bi bi-buildings-fill"></i>
+          <span>Mairies</span>
+        </a>
+        <a href="/admin/" class="sidebar-link">
+          <i class="bi bi-shield-fill-check"></i>
+          <span>Admin Django</span>
+        </a>
+        <a href="{% url 'api:declaration-list' %}" class="sidebar-link">
+          <i class="bi bi-code-slash"></i>
+          <span>API REST</span>
+        </a>
+        {% endif %}
+
+        {% endif %}
+      </nav>
+
+      {% if user.is_authenticated %}
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="sidebar-avatar">{{ user.username|first|upper }}</div>
+          <div class="sidebar-user-info">
+            <div class="name">{{ user.get_full_name|default:user.username }}</div>
+            <div class="role">{{ user.get_role_display }}</div>
+          </div>
+          <form method="post" action="{% url 'accounts:logout' %}" class="m-0">
+            {% csrf_token %}
+            <button type="submit" title="Deconnexion" class="logout-icon-btn">
+              <i class="bi bi-box-arrow-right"></i>
+            </button>
+          </form>
+        </div>
+      </div>
+      {% endif %}
+    </aside>
+
+    <!-- ─── Main Content ─── -->
+    <main class="main-content">
+
+      <!-- Top Header -->
+      <header class="top-header">
+        <!-- Hamburger button (mobile) -->
+        <button class="hamburger-btn d-md-none" id="hamburgerBtn" aria-label="Ouvrir le menu">
+          <i class="bi bi-list"></i>
+        </button>
+        <div class="header-title-wrap">
+          <div class="page-title">{% block page_title %}Tableau de bord{% endblock %}</div>
+          <div class="page-subtitle">{% block page_subtitle %}{% endblock %}</div>
+        </div>
+        <div class="header-actions">
+          {% block header_actions %}{% endblock %}
+          {% if user.is_authenticated %}
+          <form method="post" action="{% url 'accounts:logout' %}" class="m-0">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-secondary btn-sm">
+              <i class="bi bi-box-arrow-right"></i>
+              Déconnexion
+            </button>
+          </form>
+          {% endif %}
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="content-area fade-in" id="contentArea">
+        {% block content %}{% endblock %}
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ─── Toast Container ─── -->
+  <div class="toast-container" id="toastContainer">
+    {% if messages %}
+    {% for message in messages %}
+    <div class="toast-notif toast-{{ message.tags|default:'info' }}" role="alert">
+      <div class="toast-notif-icon">
+        <i
+          class="bi bi-{% if message.tags == 'success' %}check-circle-fill{% elif message.tags == 'warning' %}exclamation-triangle-fill{% elif message.tags == 'error' or message.tags == 'danger' %}x-circle-fill{% else %}info-circle-fill{% endif %}"></i>
+      </div>
+      <div class="toast-notif-body">
+        {% if 'safe' in message.extra_tags %}{{ message|safe }}{% else %}{{ message }}{% endif %}
+      </div>
+      <button class="toast-notif-close" onclick="this.parentElement.remove()">
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+    {% endfor %}
+    {% endif %}
+  </div>
+
+  <div class="modal fade" id="confirmActionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content confirm-modal">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title"><i class="bi bi-shield-check me-2"></i>Confirmation requise</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+        </div>
+        <div class="modal-body pt-2">
+          <p id="confirmActionText" class="mb-0">Confirmez-vous cette action ?</p>
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="button" class="btn btn-danger" id="confirmActionSubmit">Confirmer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // ─── Page transition ───
+    window.addEventListener('DOMContentLoaded', function () {
+      document.body.classList.remove('page-entering');
+      document.body.classList.add('page-ready');
+    });
+
+    // ─── Mobile Sidebar ───
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const sidebarClose = document.getElementById('sidebarClose');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+
+    function openSidebar() {
+      sidebar.classList.add('open');
+      overlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeSidebar() {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    if (hamburgerBtn) hamburgerBtn.addEventListener('click', openSidebar);
+    if (sidebarClose) sidebarClose.addEventListener('click', closeSidebar);
+    if (overlay) overlay.addEventListener('click', closeSidebar);
+
+    // ─── Auto-dismiss toasts ───
+    document.querySelectorAll('.toast-notif').forEach(function (toast) {
+      // Animate in
+      setTimeout(function () { toast.classList.add('show'); }, 50);
+      // Auto-dismiss after 4.5s
+      setTimeout(function () {
+        toast.classList.add('hide');
+        setTimeout(function () { toast.remove(); }, 400);
+      }, 4500);
+    });
+
+    // ─── Stagger reveal for page blocks ───
+    const contentArea = document.getElementById('contentArea');
+    if (contentArea) {
+      Array.from(contentArea.children).forEach(function (el, index) {
+        el.classList.add('reveal-item');
+        el.style.animationDelay = (index * 70) + 'ms';
+      });
+    }
+
+    // ─── KPI Count-up animation ───
+    const statValues = document.querySelectorAll('.stat-value');
+    if ('IntersectionObserver' in window && statValues.length > 0) {
+      const counterObserver = new IntersectionObserver(function (entries, observer) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          const el = entry.target;
+          if (el.dataset.animated === '1') return;
+          const rawText = (el.textContent || '').trim();
+          const target = parseInt(rawText.replace(/[^\d-]/g, ''), 10);
+          if (Number.isNaN(target)) return;
+          const duration = 900;
+          const start = performance.now();
+          const from = 0;
+          function tick(now) {
+            const progress = Math.min((now - start) / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            const value = Math.round(from + (target - from) * eased);
+            el.textContent = value.toLocaleString('fr-FR');
+            if (progress < 1) {
+              requestAnimationFrame(tick);
+            } else {
+              el.dataset.animated = '1';
+            }
+          }
+          requestAnimationFrame(tick);
+          observer.unobserve(el);
+        });
+      }, { threshold: 0.35 });
+      statValues.forEach(function (el) { counterObserver.observe(el); });
+    }
+
+    // ─── Skeleton loaders for tables (initial paint) ───
+    document.querySelectorAll('.table-shell').forEach(function (shell) {
+      shell.classList.add('loading');
+      var skeleton = document.createElement('div');
+      skeleton.className = 'table-skeleton';
+      for (var i = 0; i < 4; i++) {
+        skeleton.innerHTML += '' +
+          '<div class="skeleton-row">' +
+          '<div class="skeleton skeleton-line lg"></div>' +
+          '<div class="skeleton skeleton-line md"></div>' +
+          '<div class="skeleton skeleton-line sm"></div>' +
+          '</div>';
+      }
+      shell.insertAdjacentElement('afterend', skeleton);
+      setTimeout(function () {
+        shell.classList.remove('loading');
+        if (skeleton && skeleton.parentNode) skeleton.parentNode.removeChild(skeleton);
+      }, 520);
+    });
+
+    // ─── Confirmation modal for sensitive forms ───
+    const confirmModalEl = document.getElementById('confirmActionModal');
+    const confirmTextEl = document.getElementById('confirmActionText');
+    const confirmSubmitBtn = document.getElementById('confirmActionSubmit');
+    const confirmModal = confirmModalEl ? new bootstrap.Modal(confirmModalEl) : null;
+    let pendingConfirmForm = null;
+
+    document.querySelectorAll('form[data-confirm-message]').forEach(function (form) {
+      form.addEventListener('submit', function (event) {
+        if (form.dataset.confirmed === '1') return;
+        event.preventDefault();
+        pendingConfirmForm = form;
+        if (confirmTextEl) {
+          confirmTextEl.textContent = form.getAttribute('data-confirm-message') || 'Confirmez-vous cette action ?';
+        }
+        if (confirmModal) confirmModal.show();
+      });
+    });
+
+    if (confirmSubmitBtn) {
+      confirmSubmitBtn.addEventListener('click', function () {
+        if (!pendingConfirmForm) return;
+        pendingConfirmForm.dataset.confirmed = '1';
+        if (confirmModal) confirmModal.hide();
+        pendingConfirmForm.requestSubmit();
+      });
+    }
+
+    // ─── Page leave transition on internal links ───
+    document.querySelectorAll('a[href]').forEach(function (link) {
+      link.addEventListener('click', function (event) {
+        const href = link.getAttribute('href');
+        if (!href) return;
+        if (href.startsWith('#') || href.startsWith('javascript:')) return;
+        if (link.hasAttribute('download') || link.dataset.noTransition === '1') return;
+        if (link.target && link.target !== '_self') return;
+        if (link.hasAttribute('data-bs-toggle')) return;
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        const url = new URL(href, window.location.origin);
+        if (url.origin !== window.location.origin) return;
+        if (url.pathname === window.location.pathname && url.search === window.location.search && url.hash) return;
+        event.preventDefault();
+        document.body.classList.add('page-leaving');
+        setTimeout(function () {
+          window.location.assign(url.toString());
+        }, 180);
+      });
+    });
+
+    // ─── Form submit loading state ───
+    document.querySelectorAll('form').forEach(function (form) {
+      // Skip logout forms
+      if (form.getAttribute('action') && form.getAttribute('action').includes('logout')) return;
+      form.addEventListener('submit', function () {
+        if (form.hasAttribute('data-confirm-message') && form.dataset.confirmed !== '1') return;
+        if (form.hasAttribute('data-status-action')) {
+          form.classList.add('status-action-running');
+        }
+        var btn = form.querySelector('button[type="submit"]:not(.toast-notif-close)');
+        if (btn && !btn.classList.contains('no-loading')) {
+          btn.disabled = true;
+          btn.classList.add('btn-busy');
+          var originalHTML = btn.innerHTML;
+          btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Traitement...';
+          // Re-enable after 8s fallback
+          setTimeout(function () {
+            btn.disabled = false;
+            btn.classList.remove('btn-busy');
+            btn.innerHTML = originalHTML;
+          }, 8000);
+        }
+      });
+    });
+  </script>
+
+  {% block extra_js %}{% endblock %}
+</body>
+
+</html>

@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Mairies{% endblock %}
+{% block page_title %}Gestion des mairies{% endblock %}
+{% block page_subtitle %}Ajouter et consulter les mairies de la plateforme{% endblock %}
+
+{% block content %}
+<section class="hero-strip">
+    <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
+        <div>
+            <div class="hero-kicker">Administration Mairies</div>
+            <h2 class="hero-title">Gestion du reseau communal</h2>
+            <p class="hero-meta">Maintenez le referentiel des mairies et supervisez les operations d'administration.</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <span class="glass-chip"><i class="bi bi-buildings-fill"></i>Referentiel territorial</span>
+            <span class="glass-chip"><i class="bi bi-geo-alt-fill"></i>Villes et contacts</span>
+        </div>
+    </div>
+</section>
+
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="form-section card-glow">
+            <div class="form-section-header">
+                <i class="bi bi-building-add"></i>
+                <h6>Nouvelle mairie</h6>
+            </div>
+            <div class="form-section-body">
+                <form method="post" class="d-grid gap-2">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <div>
+                        <label class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                        <div class="text-danger mt-1 field-error">{{ field.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-primary mt-2">
+                        <i class="bi bi-save"></i> Ajouter mairie
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card card-glow">
+            <div class="card-header">
+                <h5><i class="bi bi-buildings-fill me-2"></i>Mairies</h5>
+                <form method="get" class="d-flex gap-2">
+                    <input type="text" name="q" value="{{ search }}" class="form-control form-control-sm"
+                        placeholder="Rechercher...">
+                    <input type="text" name="ville" value="{{ ville_filter }}" class="form-control form-control-sm"
+                        placeholder="Filtrer par ville...">
+                    <button class="btn btn-outline-secondary btn-sm" type="submit">Filtrer</button>
+                </form>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-shell">
+                    <table class="table-modern w-100">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Ville</th>
+                                <th>Adresse</th>
+                                <th>Contact</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for m in mairies %}
+                            <tr>
+                                <td>{{ m.nom }}</td>
+                                <td>{{ m.ville|default:"-" }}</td>
+                                <td>{{ m.adresse|default:"-" }}</td>
+                                <td>{{ m.contact|default:"-" }}</td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'accounts:admin_mairie_edit' m.pk %}" class="btn btn-outline-secondary btn-sm" title="Modifier">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <form method="post" action="{% url 'accounts:admin_mairie_delete' m.pk %}" class="m-0" data-confirm-message="Supprimer cette mairie du referentiel ?">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger btn-sm" title="Supprimer">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-3">Aucune mairie trouvée.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% if page_obj.paginator.num_pages > 1 %}
+            <div class="d-flex align-items-center justify-content-between mt-3 flex-wrap gap-2 px-3 pb-3">
+                <div class="metric-meta">
+                    Mairies <strong>{{ page_obj.start_index }}–{{ page_obj.end_index }}</strong>
+                    sur <strong>{{ page_obj.paginator.count }}</strong>
+                </div>
+                <nav>
+                    <ul class="pagination-custom">
+                        {% if page_obj.has_previous %}
+                        <li><a href="?page={{ page_obj.previous_page_number }}&q={{ search }}&ville={{ ville_filter }}" class="page-btn"><i class="bi bi-chevron-left"></i></a></li>
+                        {% endif %}
+                        {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                        <li><span class="page-btn active">{{ num }}</span></li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li><a href="?page={{ num }}&q={{ search }}&ville={{ ville_filter }}" class="page-btn">{{ num }}</a></li>
+                        {% endif %}
+                        {% endfor %}
+                        {% if page_obj.has_next %}
+                        <li><a href="?page={{ page_obj.next_page_number }}&q={{ search }}&ville={{ ville_filter }}" class="page-btn"><i class="bi bi-chevron-right"></i></a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="card card-glow mt-4">
+    <div class="card-header">
+        <h5><i class="bi bi-clock-history me-2"></i>Journal des actions admin</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-shell">
+            <table class="table-modern w-100">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Admin</th>
+                        <th>Type</th>
+                        <th>Cible</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                    <tr>
+                        <td>{{ log.created_at|date:"d/m/Y H:i" }}</td>
+                        <td>{{ log.actor.username|default:"Système" }}</td>
+                        <td>{{ log.get_action_type_display }}</td>
+                        <td>{{ log.target_type }} #{{ log.target_id }} ({{ log.target_label }})</td>
+                        <td>{{ log.description|default:"-" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="text-center py-3">Aucune action enregistrée.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

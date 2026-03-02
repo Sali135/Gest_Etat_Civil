@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard Hôpital{% endblock %}
+{% block page_title %}Tableau de bord{% endblock %}
+{% block page_subtitle %}{{ hopital.nom|default:"Hôpital" }} — Vue d'ensemble de vos déclarations{% endblock %}
+
+{% block header_actions %}
+<a href="{% url 'naissances:declaration_create' %}" class="btn btn-primary btn-sm">
+    <i class="bi bi-plus-circle-fill"></i> Nouvelle déclaration
+</a>
+{% endblock %}
+
+{% block content %}
+<section class="hero-strip">
+    <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
+        <div>
+            <div class="hero-kicker">Espace Hopital</div>
+            <h2 class="hero-title">Pilotage des declarations</h2>
+            <p class="hero-meta">Suivez vos dossiers, anticipez les retards et transmettez rapidement a la mairie.</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <span class="glass-chip"><i class="bi bi-clock-history"></i>Traitement en continu</span>
+            <span class="glass-chip"><i class="bi bi-shield-check"></i>Flux trace</span>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Row -->
+<div class="row g-4 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card primary">
+            <div class="stat-card-icon"><i class="bi bi-file-earmark-text-fill"></i></div>
+            <div class="stat-value">{{ stats.total }}</div>
+            <div class="stat-label">Total déclarations</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card warning">
+            <div class="stat-card-icon"><i class="bi bi-hourglass-split"></i></div>
+            <div class="stat-value">{{ stats.en_attente }}</div>
+            <div class="stat-label">En attente</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card success">
+            <div class="stat-card-icon"><i class="bi bi-check-circle-fill"></i></div>
+            <div class="stat-value">{{ stats.valides }}</div>
+            <div class="stat-label">Validées</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card danger">
+            <div class="stat-card-icon"><i class="bi bi-x-circle-fill"></i></div>
+            <div class="stat-value">{{ stats.rejetes }}</div>
+            <div class="stat-label">Rejetées</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card warning">
+            <div class="stat-card-icon"><i class="bi bi-alarm-fill"></i></div>
+            <div class="stat-value">{{ stats.en_retard }}</div>
+            <div class="stat-label">Dossiers en retard</div>
+        </div>
+    </div>
+</div>
+
+<!-- Progress bar -->
+{% if stats.total > 0 %}
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="metric-meta">Taux de validation</span>
+            <span class="metric-meta"><strong>
+                {% widthratio stats.valides stats.total 100 %}%
+            </strong></span>
+        </div>
+        <div class="progress-bar-custom">
+            <div class="progress-bar-fill progress-fill-success"
+                style="width: {% widthratio stats.valides stats.total 100 %}%;">
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Recent Declarations -->
+<div class="card">
+    <div class="card-header">
+        <h5><i class="bi bi-clock-history me-2"></i>Declarations recentes</h5>
+        <a href="{% url 'naissances:declaration_list' %}" class="btn btn-outline-secondary btn-sm">
+            Voir tout <i class="bi bi-arrow-right ms-1"></i>
+        </a>
+    </div>
+    <div class="card-body p-0">
+        {% if recent %}
+        <div class="table-shell">
+        <table class="table-modern w-100">
+            <thead>
+                <tr>
+                    <th>Référence</th>
+                    <th>Enfant</th>
+                    <th>Date naissance</th>
+                    <th>Mairie</th>
+                    <th>Statut</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for d in recent %}
+                <tr>
+                    <td>
+                        <span class="ref-code">{{ d.reference }}</span>
+                    </td>
+                    <td>
+                        <span class="fw-semibold">{{ d.nom_complet_enfant }}</span>
+                        <br><small class="text-soft">{{ d.get_sexe_display }}</small>
+                    </td>
+                    <td>{{ d.date_naissance|date:"d/m/Y" }}</td>
+                    <td>{{ d.mairie.nom }}</td>
+                    <td>
+                        <span class="badge-status {{ d.statut|lower|cut:'_' }}">
+                            {% if d.statut == 'EN_ATTENTE' %}⏳{% elif d.statut == 'VALIDE' %}✅{% else %}❌{% endif %}
+                            {{ d.get_statut_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{% url 'naissances:declaration_detail' d.pk %}"
+                            class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📋</div>
+            <h5>Aucune déclaration</h5>
+            <p>Commencez par enregistrer une nouvelle naissance.</p>
+            <a href="{% url 'naissances:declaration_create' %}" class="btn btn-primary mt-3">
+                <i class="bi bi-plus-circle-fill me-2"></i>Nouvelle déclaration
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
