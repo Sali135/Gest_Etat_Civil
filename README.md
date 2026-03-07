@@ -74,6 +74,7 @@ Copy-Item .env.example .env
 ```bash
 docker compose up -d --build
 ```
+> Si votre installation utilise l'ancien binaire Compose, utilisez `docker-compose up -d --build`.
 
 Services lancés:
 - `web` (Django + Gunicorn)
@@ -85,6 +86,7 @@ Services lancés:
 docker compose exec web python manage.py migrate
 docker compose exec web python manage.py createsuperuser
 ```
+> Variante ancienne commande: `docker-compose exec web ...`
 
 ### 4. Charger les données de démonstration (optionnel)
 ```bash
@@ -192,7 +194,7 @@ EMAIL_HOST_PASSWORD = 'votre-mot-de-passe'
 
 ## Technologies
 
-- **Backend** : Django 4.2, Django REST Framework
+- **Backend** : Django 5.x, Django REST Framework
 - **Base de données** : SQLite (développement)
 - **Frontend** : Bootstrap 5, Bootstrap Icons, Google Fonts (Inter)
 - **PDF** : xhtml2pdf
