@@ -92,6 +92,7 @@ docker compose exec web python manage.py createsuperuser
 ```bash
 docker compose exec web python manage.py seed_demo
 ```
+> En mode prototype, vous pouvez aussi laisser la page de login créer/mettre à jour automatiquement les comptes démo via `DJANGO_ENABLE_DEMO_ACCOUNTS=True`.
 
 ### 5. Accès application
 - http://localhost

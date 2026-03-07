@@ -1,4 +1,6 @@
 """Views for accounts app - Authentication."""
+# Variables d'environnement pour mode démo/prototype.
+import os
 # Import des helpers d'authentification Django (connexion / déconnexion de session utilisateur).
 from django.contrib.auth import login, logout
 from django.contrib.auth.views import LoginView, LogoutView
@@ -14,8 +16,8 @@ from django.db.models import Q
 from django.core.paginator import Paginator
 # Génération d'URL à partir du nom de route.
 from django.urls import reverse_lazy
-# Modèle métier importé depuis l'app naissances.
-from naissances.models import Mairie
+# Modèles métiers importés depuis l'app naissances.
+from naissances.models import Hopital, Mairie
 # Formulaires utilisés pour les écrans d'administration.
 from .forms import (
     LoginForm, CustomUserCreationForm, MairieCreationForm,
@@ -34,6 +36,11 @@ class CustomLoginView(LoginView):
     # Si l'utilisateur est déjà connecté, on le redirige sans réafficher le login.
     redirect_authenticated_user = True
 
+    def dispatch(self, request, *args, **kwargs):
+        # En mode prototype, s'assure que les comptes de démonstration existent.
+        _ensure_demo_accounts()
+        return super().dispatch(request, *args, **kwargs)
+
     def get_success_url(self):
         # Après connexion réussie, on envoie l'utilisateur vers son dashboard (router par rôle).
         return reverse_lazy('naissances:dashboard')
@@ -48,6 +55,89 @@ class CustomLogoutView(LogoutView):
 def _is_platform_admin(user):
     # Retourne True si l'utilisateur est connecté et dispose des droits d'administration plateforme.
     return user.is_authenticated and (user.is_superuser or user.role == CustomUser.Role.ADMIN)
+
+
+def _env_bool(name, default=False):
+    # Convertit proprement une variable d'environnement texte en booléen.
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.strip().lower() in {'1', 'true', 'yes', 'on'}
+
+
+def _ensure_demo_accounts():
+    """Create demo entities/users if missing (prototype mode)."""
+    if not _env_bool('DJANGO_ENABLE_DEMO_ACCOUNTS', default=True):
+        return
+
+    def _sync_demo_user(username, password, defaults):
+        # Crée le compte s'il manque, et peut réaligner le mot de passe en mode prototype.
+        user, _ = CustomUser.objects.get_or_create(username=username, defaults=defaults)
+        dirty = False
+        for field, value in defaults.items():
+            if getattr(user, field) != value:
+                setattr(user, field, value)
+                dirty = True
+        if _env_bool('DJANGO_DEMO_FORCE_PASSWORD_RESET', default=True):
+            user.set_password(password)
+            dirty = True
+        if dirty:
+            user.save()
+
+    # Référentiels minimaux requis par les comptes de démonstration.
+    hopital, _ = Hopital.objects.get_or_create(
+        nom='CHU de Cocody',
+        defaults={
+            'adresse': 'Boulevard de la Paix, Cocody, Abidjan',
+            'contact': '+225 27 22 44 00 00',
+        },
+    )
+    mairie, _ = Mairie.objects.get_or_create(
+        nom='Mairie de Cocody',
+        defaults={
+            'adresse': 'Avenue Houphouet-Boigny, Cocody',
+            'contact': '+225 27 22 44 55 66',
+            'ville': 'Cocody',
+        },
+    )
+
+    _sync_demo_user(
+        username='admin',
+        password='admin123',
+        defaults={
+            'email': 'admin@gestetatcivil.cm',
+            'first_name': 'Super',
+            'last_name': 'Admin',
+            'role': CustomUser.Role.ADMIN,
+            'is_staff': True,
+            'is_superuser': True,
+            'is_active': True,
+        },
+    )
+    _sync_demo_user(
+        username='hopital1',
+        password='demo1234',
+        defaults={
+            'email': 'hopital1@gestetatcivil.cm',
+            'first_name': 'Kouame',
+            'last_name': 'Assi',
+            'role': CustomUser.Role.HOPITAL,
+            'hopital': hopital,
+            'is_active': True,
+        },
+    )
+    _sync_demo_user(
+        username='mairie1',
+        password='demo1234',
+        defaults={
+            'email': 'mairie1@gestetatcivil.cm',
+            'first_name': 'Adjoua',
+            'last_name': 'Konan',
+            'role': CustomUser.Role.MAIRIE,
+            'mairie': mairie,
+            'is_active': True,
+        },
+    )
 
 
 def _log_admin_action(actor, action_type, target_type, target_id, target_label, description=''):
