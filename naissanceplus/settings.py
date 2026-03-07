@@ -42,6 +42,9 @@ ALLOWED_HOSTS = [
     if host.strip()
 ]
 
+# Origines fiables pour formulaires CSRF (utile derrière reverse proxy).
+CSRF_TRUSTED_ORIGINS = _env_csv('DJANGO_CSRF_TRUSTED_ORIGINS', '')
+
 INSTALLED_APPS = [
     # Apps natives Django.
     'django.contrib.admin',
@@ -89,13 +92,29 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'naissanceplus.wsgi.application'
 
-# Base de données dev par défaut (SQLite locale).
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Base de données configurable (SQLite par défaut, PostgreSQL en Docker/prod).
+_db_engine = os.getenv('DJANGO_DB_ENGINE', 'django.db.backends.sqlite3')
+if _db_engine in {'postgres', 'postgresql'}:
+    _db_engine = 'django.db.backends.postgresql'
+if _db_engine == 'django.db.backends.sqlite3':
+    _sqlite_name = os.getenv('DJANGO_DB_NAME', str(BASE_DIR / 'db.sqlite3'))
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': _sqlite_name,
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': _db_engine,
+            'NAME': os.getenv('DJANGO_DB_NAME', 'gest_etatcivil'),
+            'USER': os.getenv('DJANGO_DB_USER', 'gest_user'),
+            'PASSWORD': os.getenv('DJANGO_DB_PASSWORD', 'gest_password'),
+            'HOST': os.getenv('DJANGO_DB_HOST', 'db'),
+            'PORT': os.getenv('DJANGO_DB_PORT', '5432'),
+        }
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     # Politiques minimales de robustesse mot de passe.

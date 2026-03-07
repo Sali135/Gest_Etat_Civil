@@ -56,6 +56,53 @@ Accédez à : **http://127.0.0.1:8000/**
 
 ---
 
+## Déploiement avec Docker
+
+### Prérequis
+- Docker Desktop (ou Docker Engine + Docker Compose v2)
+
+### 1. Préparer les variables d'environnement
+```bash
+cp .env.example .env
+```
+> Sous Windows PowerShell:
+```powershell
+Copy-Item .env.example .env
+```
+
+### 2. Construire et lancer les services
+```bash
+docker compose up -d --build
+```
+
+Services lancés:
+- `web` (Django + Gunicorn)
+- `db` (PostgreSQL)
+- `nginx` (reverse proxy + static/media)
+
+### 3. Appliquer migrations / créer un admin
+```bash
+docker compose exec web python manage.py migrate
+docker compose exec web python manage.py createsuperuser
+```
+
+### 4. Charger les données de démonstration (optionnel)
+```bash
+docker compose exec web python manage.py seed_demo
+```
+
+### 5. Accès application
+- http://localhost
+
+### Commandes utiles
+```bash
+docker compose logs -f web
+docker compose down
+docker compose down -v   # supprime aussi les volumes (base de données incluse)
+```
+
+---
+
 ## Comptes de démonstration (après `seed_demo`)
 
 | Rôle | Identifiant | Mot de passe |
