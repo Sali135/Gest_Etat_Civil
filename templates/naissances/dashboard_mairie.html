@@ -6,142 +6,60 @@
 
 {% block header_actions %}
 <a href="{% url 'naissances:declaration_list' %}?statut=EN_ATTENTE" class="btn btn-primary btn-sm">
-    <i class="bi bi-inbox-fill"></i> Dossiers en attente
-    {% if stats.en_attente > 0 %}
-    <span class="badge bg-warning text-dark ms-1">{{ stats.en_attente }}</span>
-    {% endif %}
+  <i class="bi bi-inbox-fill"></i> Dossiers en attente
+  {% if stats.en_attente > 0 %}
+  <span class="badge bg-warning text-dark ms-1">{{ stats.en_attente }}</span>
+  {% endif %}
 </a>
 {% endblock %}
 
 {% block content %}
-<section class="hero-strip">
-    <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
-        <div>
-            <div class="hero-kicker">Espace Mairie</div>
-            <h2 class="hero-title">File de traitement priorisee</h2>
-            <p class="hero-meta">Validez rapidement les dossiers conformes et documentez clairement les rejets.</p>
-        </div>
-        <div class="d-flex flex-wrap gap-2">
-            <span class="glass-chip"><i class="bi bi-clipboard-check"></i>Controle qualite</span>
-            <span class="glass-chip"><i class="bi bi-file-earmark-text"></i>Actes generes</span>
-        </div>
-    </div>
-</section>
+<div class="dashboard-shell">
+  <section class="hero-strip dashboard-filter-strip">
+    <div class="d-flex flex-wrap align-items-end justify-content-between gap-3">
+      <div>
+        <div class="hero-kicker">Pilotage mairie</div>
+        <h2 class="hero-title mb-1">File de traitement dynamique</h2>
+        <p class="hero-meta">Mettez à jour les indicateurs et la file en attente sans recharger la page.</p>
+      </div>
 
-<!-- Stats Row -->
-<div class="row g-4 mb-4">
-    <div class="col-sm-6 col-xl-3">
-        <div class="stat-card primary">
-            <div class="stat-card-icon"><i class="bi bi-inbox-fill"></i></div>
-            <div class="stat-value">{{ stats.total }}</div>
-            <div class="stat-label">Dossiers reçus</div>
+      <form id="mairieDashboardFilters"
+            class="header-filter-form dashboard-filter-form"
+            hx-get="{% url 'naissances:dashboard_mairie' %}"
+            hx-target="#dashboard-mairie-content"
+            hx-swap="outerHTML"
+            hx-push-url="false"
+            hx-indicator="#dashboard-mairie-loader"
+            hx-trigger="change from:select delay:200ms, submit">
+        <div class="dashboard-filter-group">
+          <label class="form-label mb-1" for="mairie-dashboard-period">Période</label>
+          <select id="mairie-dashboard-period" class="form-select form-select-sm" name="periode">
+            {% for value, label in period_options %}
+            <option value="{{ value }}" {% if filters.periode == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
         </div>
-    </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="stat-card warning">
-            <div class="stat-card-icon"><i class="bi bi-hourglass-split"></i></div>
-            <div class="stat-value">{{ stats.en_attente }}</div>
-            <div class="stat-label">À traiter</div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="stat-card success">
-            <div class="stat-card-icon"><i class="bi bi-patch-check-fill"></i></div>
-            <div class="stat-value">{{ stats.valides }}</div>
-            <div class="stat-label">Actes générés</div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="stat-card danger">
-            <div class="stat-card-icon"><i class="bi bi-x-circle-fill"></i></div>
-            <div class="stat-value">{{ stats.rejetes }}</div>
-            <div class="stat-label">Rejetées</div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="stat-card success">
-            <div class="stat-card-icon"><i class="bi bi-heart-fill"></i></div>
-            <div class="stat-value">{{ stats.mariages }}</div>
-            <div class="stat-label">Mariages</div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="stat-card info">
-            <div class="stat-card-icon"><i class="bi bi-file-earmark-x-fill"></i></div>
-            <div class="stat-value">{{ stats.deces }}</div>
-            <div class="stat-label">Décès</div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="stat-card warning">
-            <div class="stat-card-icon"><i class="bi bi-alarm-fill"></i></div>
-            <div class="stat-value">{{ stats.en_retard }}</div>
-            <div class="stat-label">Dossiers en retard</div>
-        </div>
-    </div>
-</div>
 
-<!-- Worklist -->
-<div class="card">
-    <div class="card-header">
-        <h5>
-            <i class="bi bi-list-task me-2"></i>
-            File de travail — Dossiers en attente
-        </h5>
-        <a href="{% url 'naissances:declaration_list' %}" class="btn btn-outline-secondary btn-sm">
-            Toutes les déclarations <i class="bi bi-arrow-right ms-1"></i>
-        </a>
-    </div>
-    <div class="card-body p-0">
-        {% if worklist %}
-        <div class="table-shell">
-        <table class="table-modern w-100">
-            <thead>
-                <tr>
-                    <th>Référence</th>
-                    <th>Enfant</th>
-                    <th>Date naissance</th>
-                    <th>Hôpital</th>
-                    <th>Reçu le</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for d in worklist %}
-                <tr>
-                    <td>
-                        <span class="ref-code">{{ d.reference }}</span>
-                    </td>
-                    <td>
-                        <span class="fw-semibold">{{ d.nom_complet_enfant }}</span>
-                        <br><small class="text-soft">{{ d.get_sexe_display }}</small>
-                    </td>
-                    <td>{{ d.date_naissance|date:"d/m/Y" }}</td>
-                    <td>
-                        <span class="text-soft">{{ d.hopital.nom }}</span>
-                    </td>
-                    <td>
-                        <span class="text-soft">{{ d.date_creation|date:"d/m/Y H:i" }}</span>
-                    </td>
-                    <td>
-                        <div class="d-flex gap-1">
-                            <a href="{% url 'naissances:declaration_detail' d.pk %}" class="btn btn-primary btn-sm">
-                                <i class="bi bi-eye me-1"></i>Traiter
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div class="dashboard-filter-group">
+          <label class="form-label mb-1" for="mairie-dashboard-limit">Taille de la file</label>
+          <select id="mairie-dashboard-limit" class="form-select form-select-sm" name="limite">
+            {% for value in limit_options %}
+            <option value="{{ value }}" {% if filters.limite == value %}selected{% endif %}>{{ value }}</option>
+            {% endfor %}
+          </select>
         </div>
-        {% else %}
-        <div class="empty-state">
-            <div class="empty-state-icon">✅</div>
-            <h5>Aucun dossier en attente</h5>
-            <p>Tous les dossiers ont été traités. Excellent travail !</p>
-        </div>
-        {% endif %}
+
+        <button type="submit" class="btn btn-primary btn-sm">
+          <i class="bi bi-arrow-repeat me-1"></i>Actualiser
+        </button>
+        <span id="dashboard-mairie-loader" class="dashboard-inline-loader htmx-indicator" aria-live="polite">
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          Mise a jour...
+        </span>
+      </form>
     </div>
+  </section>
+
+  {% include 'naissances/partials/dashboard_mairie_content.html' %}
 </div>
 {% endblock %}

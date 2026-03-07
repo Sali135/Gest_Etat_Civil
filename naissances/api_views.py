@@ -62,6 +62,47 @@ class IsMairieOrAdmin(permissions.BasePermission):
         return user.is_authenticated and (user.is_superuser or user.role in ['MAIRIE', 'ADMIN'])
 
 
+def _api_validate_declaration_and_generate_acte(
+    request,
+    *,
+    declaration_model,
+    acte_model,
+    serializer_class,
+    pk,
+    agent_field,
+):
+    """
+    Shared API validation flow:
+    - lock declaration row
+    - validate permissions/status
+    - set declaration to VALIDE
+    - generate acte idempotently
+    - return serialized declaration
+    """
+    declaration = generics.get_object_or_404(
+        declaration_model.objects.select_for_update(),
+        pk=pk,
+    )
+
+    if request.user.role == 'MAIRIE' and declaration.mairie != request.user.mairie:
+        raise PermissionDenied("Vous ne pouvez pas traiter cette déclaration.")
+
+    if declaration.statut not in [
+        declaration_model.Statut.EN_ATTENTE,
+        declaration_model.Statut.EN_VERIFICATION,
+    ]:
+        raise ValidationError("Cette déclaration a déjà été traitée.")
+
+    declaration.statut = declaration_model.Statut.VALIDE
+    declaration.motif_rejet = ''
+    setattr(declaration, agent_field, request.user)
+    declaration.date_traitement = timezone.now()
+    declaration.save(update_fields=['statut', 'motif_rejet', agent_field, 'date_traitement'])
+
+    acte_model.objects.get_or_create(declaration=declaration)
+    return Response(serializer_class(declaration).data)
+
+
 class DeclarationListCreateAPIView(generics.ListCreateAPIView):
     """Naissances: list and create."""
     # Auth obligatoire pour tout appel à cet endpoint.
@@ -173,21 +214,14 @@ class MariageValiderAPIView(APIView):
 
     @transaction.atomic
     def post(self, request, pk):
-        # select_for_update verrouille la ligne pour éviter les doubles traitements concurrents.
-        declaration = generics.get_object_or_404(DeclarationMariage.objects.select_for_update(), pk=pk)
-        if request.user.role == 'MAIRIE' and declaration.mairie != request.user.mairie:
-            raise PermissionDenied("Vous ne pouvez pas traiter cette déclaration.")
-        if declaration.statut not in [DeclarationMariage.Statut.EN_ATTENTE, DeclarationMariage.Statut.EN_VERIFICATION]:
-            raise ValidationError("Cette déclaration a déjà été traitée.")
-        declaration.statut = DeclarationMariage.Statut.VALIDE
-        declaration.motif_rejet = ''
-        declaration.agent_mairie = request.user
-        declaration.date_traitement = timezone.now()
-        declaration.save()
-        # Création idempotente de l'acte.
-        ActeMariage.objects.get_or_create(declaration=declaration)
-        # Retour JSON du dossier mis à jour.
-        return Response(DeclarationMariageSerializer(declaration).data)
+        return _api_validate_declaration_and_generate_acte(
+            request,
+            declaration_model=DeclarationMariage,
+            acte_model=ActeMariage,
+            serializer_class=DeclarationMariageSerializer,
+            pk=pk,
+            agent_field='agent_mairie',
+        )
 
 
 class MariageRejeterAPIView(APIView):
@@ -273,20 +307,14 @@ class DecesValiderAPIView(APIView):
 
     @transaction.atomic
     def post(self, request, pk):
-        # Verrouillage transactionnel pour éviter les doubles validations.
-        declaration = generics.get_object_or_404(DeclarationDeces.objects.select_for_update(), pk=pk)
-        if request.user.role == 'MAIRIE' and declaration.mairie != request.user.mairie:
-            raise PermissionDenied("Vous ne pouvez pas traiter cette déclaration.")
-        if declaration.statut not in [DeclarationDeces.Statut.EN_ATTENTE, DeclarationDeces.Statut.EN_VERIFICATION]:
-            raise ValidationError("Cette déclaration a déjà été traitée.")
-        declaration.statut = DeclarationDeces.Statut.VALIDE
-        declaration.motif_rejet = ''
-        declaration.agent_traitement = request.user
-        declaration.date_traitement = timezone.now()
-        declaration.save()
-        # Génération idempotente de l'acte.
-        ActeDeces.objects.get_or_create(declaration=declaration)
-        return Response(DeclarationDecesSerializer(declaration).data)
+        return _api_validate_declaration_and_generate_acte(
+            request,
+            declaration_model=DeclarationDeces,
+            acte_model=ActeDeces,
+            serializer_class=DeclarationDecesSerializer,
+            pk=pk,
+            agent_field='agent_traitement',
+        )
 
 
 class DecesRejeterAPIView(APIView):

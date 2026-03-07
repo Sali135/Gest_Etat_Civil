@@ -6,120 +6,60 @@
 
 {% block header_actions %}
 <a href="{% url 'naissances:deces_create' %}" class="btn btn-primary btn-sm">
-    <i class="bi bi-plus-circle-fill"></i> Nouveau décès
+  <i class="bi bi-plus-circle-fill"></i> Nouveau décès
 </a>
 <a href="{% url 'naissances:deces_list' %}" class="btn btn-outline-secondary btn-sm">
-    <i class="bi bi-list"></i> Liste complète
+  <i class="bi bi-list"></i> Liste complète
 </a>
 {% endblock %}
 
 {% block content %}
-<section class="hero-strip">
-    <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
-        <div>
-            <div class="hero-kicker">Etat Civil Deces</div>
-            <h2 class="hero-title">Gestion digne et rigoureuse des actes de deces</h2>
-            <p class="hero-meta">Centralisez les informations sensibles, suivez les délais et sécurisez la production des actes.</p>
-        </div>
-        <div class="d-flex flex-wrap gap-2">
-            <span class="glass-chip"><i class="bi bi-file-earmark-x-fill"></i>Dossiers traces</span>
-            <span class="glass-chip"><i class="bi bi-clock-history"></i>Delais maitrises</span>
-        </div>
-    </div>
-</section>
+<div class="dashboard-shell">
+  <section class="hero-strip dashboard-filter-strip">
+    <div class="d-flex flex-wrap align-items-end justify-content-between gap-3">
+      <div>
+        <div class="hero-kicker">Pilotage décès</div>
+        <h2 class="hero-title mb-1">Dashboard dynamique des actes de décès</h2>
+        <p class="hero-meta">Mettez à jour les indicateurs et les dossiers récents sans rechargement.</p>
+      </div>
 
-<div class="row g-4">
-    <div class="col-sm-6 col-xl-4">
-        <div class="stat-card danger">
-            <div class="stat-card-icon"><i class="bi bi-file-earmark-x-fill"></i></div>
-            <div class="stat-value">{{ stats.total }}</div>
-            <div class="stat-label">Total déclarations</div>
+      <form id="decesDashboardFilters"
+            class="header-filter-form dashboard-filter-form"
+            hx-get="{% url 'naissances:deces_dashboard' %}"
+            hx-target="#dashboard-deces-content"
+            hx-swap="outerHTML"
+            hx-push-url="false"
+            hx-indicator="#dashboard-deces-loader"
+            hx-trigger="change from:select delay:200ms, submit">
+        <div class="dashboard-filter-group">
+          <label class="form-label mb-1" for="deces-dashboard-period">Période</label>
+          <select id="deces-dashboard-period" class="form-select form-select-sm" name="periode">
+            {% for value, label in period_options %}
+            <option value="{{ value }}" {% if filters.periode == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
         </div>
-    </div>
-    <div class="col-sm-6 col-xl-4">
-        <div class="stat-card warning">
-            <div class="stat-card-icon"><i class="bi bi-calendar2-week-fill"></i></div>
-            <div class="stat-value">{{ stats.ce_mois }}</div>
-            <div class="stat-label">Ce mois</div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-4">
-        <div class="stat-card info">
-            <div class="stat-card-icon"><i class="bi bi-journal-medical"></i></div>
-            <div class="stat-value">{{ stats.avec_cause }}</div>
-            <div class="stat-label">Cause de décès renseignée</div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-4">
-        <div class="stat-card warning">
-            <div class="stat-card-icon"><i class="bi bi-hourglass-split"></i></div>
-            <div class="stat-value">{{ stats.en_attente }}</div>
-            <div class="stat-label">En attente</div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-4">
-        <div class="stat-card success">
-            <div class="stat-card-icon"><i class="bi bi-check-circle-fill"></i></div>
-            <div class="stat-value">{{ stats.valides }}</div>
-            <div class="stat-label">Validés</div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-4">
-        <div class="stat-card danger">
-            <div class="stat-card-icon"><i class="bi bi-x-circle-fill"></i></div>
-            <div class="stat-value">{{ stats.rejetes }}</div>
-            <div class="stat-label">Rejetés</div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-4">
-        <div class="stat-card warning">
-            <div class="stat-card-icon"><i class="bi bi-alarm-fill"></i></div>
-            <div class="stat-value">{{ stats.en_retard }}</div>
-            <div class="stat-label">Dossiers en retard</div>
-        </div>
-    </div>
-</div>
 
-<div class="card">
-    <div class="card-header">
-        <h5><i class="bi bi-clock-history me-2"></i>Décès récents</h5>
-    </div>
-    <div class="card-body p-0">
-        {% if recent %}
-        <div class="table-shell">
-            <table class="table-modern w-100">
-                <thead>
-                    <tr>
-                        <th>Référence</th>
-                        <th>Défunt</th>
-                        <th>Date décès</th>
-                        <th>Lieu</th>
-                        <th>Mairie</th>
-                        <th>Statut</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for d in recent %}
-                    <tr>
-                        <td><a class="ref-code text-decoration-none" href="{% url 'naissances:deces_detail' d.pk %}">{{ d.reference }}</a></td>
-                        <td>{{ d.nom_complet_defunt }}</td>
-                        <td>{{ d.date_deces|date:"d/m/Y" }}</td>
-                        <td>{{ d.lieu_deces }}</td>
-                        <td>{{ d.mairie.nom }}</td>
-                        <td>
-                            <span class="badge-status {{ d.statut|lower|cut:'_' }}">{{ d.get_statut_display }}</span>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <div class="dashboard-filter-group">
+          <label class="form-label mb-1" for="deces-dashboard-limit">Lignes récentes</label>
+          <select id="deces-dashboard-limit" class="form-select form-select-sm" name="limite">
+            {% for value in limit_options %}
+            <option value="{{ value }}" {% if filters.limite == value %}selected{% endif %}>{{ value }}</option>
+            {% endfor %}
+          </select>
         </div>
-        {% else %}
-        <div class="empty-state">
-            <div class="empty-state-icon">🕊️</div>
-            <h5>Aucun décès enregistré</h5>
-        </div>
-        {% endif %}
+
+        <button type="submit" class="btn btn-primary btn-sm">
+          <i class="bi bi-arrow-repeat me-1"></i>Actualiser
+        </button>
+        <span id="dashboard-deces-loader" class="dashboard-inline-loader htmx-indicator" aria-live="polite">
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          Mise a jour...
+        </span>
+      </form>
     </div>
+  </section>
+
+  {% include 'naissances/partials/dashboard_deces_content.html' %}
 </div>
 {% endblock %}

@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block title %}Anti-doublons{% endblock %}
+{% block page_title %}Contrôle anti-doublons{% endblock %}
+{% block page_subtitle %}Détection des actes possiblement redondants{% endblock %}
+
+{% block header_actions %}
+<a href="{% url 'naissances:duplicates_dashboard' %}" class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-arrow-clockwise me-1"></i>Actualiser
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-shell">
+<section class="hero-strip">
+    <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
+        <div>
+            <div class="hero-kicker">Qualité des Données</div>
+            <h2 class="hero-title">Surveillance anti-doublons des actes</h2>
+            <p class="hero-meta">Identifiez rapidement les dossiers exacts ou fortement similaires avant validation finale.</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2 hero-chip-group">
+            <span class="glass-chip strong"><i class="bi bi-shield-exclamation"></i>{{ stats.total }} alerte{{ stats.total|pluralize }}</span>
+            <span class="glass-chip"><i class="bi bi-clipboard2-check"></i>Contrôle en continu</span>
+            <span class="glass-chip"><i class="bi bi-diagram-3"></i>Naissance, Mariage, Décès</span>
+        </div>
+    </div>
+</section>
+
+<div class="row g-4 kpi-grid">
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card primary">
+            <div class="stat-card-icon"><i class="bi bi-shield-exclamation"></i></div>
+            <div class="stat-value">{{ stats.total }}</div>
+            <div class="stat-label">Alertes totales</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card danger">
+            <div class="stat-card-icon"><i class="bi bi-exclamation-octagon-fill"></i></div>
+            <div class="stat-value">{{ stats.exact }}</div>
+            <div class="stat-label">Doublons exacts</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card warning">
+            <div class="stat-card-icon"><i class="bi bi-search"></i></div>
+            <div class="stat-value">{{ stats.probable }}</div>
+            <div class="stat-label">Doublons probables</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card info">
+            <div class="stat-card-icon"><i class="bi bi-collection-fill"></i></div>
+            <div class="stat-value">{{ stats.naissance|add:stats.mariage|add:stats.deces }}</div>
+            <div class="stat-label">Paires analysées</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-4">
+        <div class="stat-card primary">
+            <div class="stat-card-icon"><i class="bi bi-file-earmark-text-fill"></i></div>
+            <div class="stat-value">{{ stats.naissance }}</div>
+            <div class="stat-label">Alertes naissance</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-4">
+        <div class="stat-card success">
+            <div class="stat-card-icon"><i class="bi bi-heart-fill"></i></div>
+            <div class="stat-value">{{ stats.mariage }}</div>
+            <div class="stat-label">Alertes mariage</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-4">
+        <div class="stat-card danger">
+            <div class="stat-card-icon"><i class="bi bi-file-earmark-x-fill"></i></div>
+            <div class="stat-value">{{ stats.deces }}</div>
+            <div class="stat-label">Alertes décès</div>
+        </div>
+    </div>
+</div>
+
+<div class="card dashboard-card">
+    <div class="card-header">
+        <h5><i class="bi bi-list-check me-2"></i>Alertes détectées</h5>
+    </div>
+    <div class="card-body p-0">
+        {% if alerts %}
+        <div class="table-shell elevated">
+            <table class="table-modern w-100">
+                <thead>
+                    <tr>
+                        <th>Niveau</th>
+                        <th>Module</th>
+                        <th>Dossier A</th>
+                        <th>Dossier B</th>
+                        <th>Confiance</th>
+                        <th>Règle</th>
+                        <th>Date acte</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for alert in alerts %}
+                    <tr>
+                        <td>
+                            {% if alert.severity == 'EXACT' %}
+                            <span class="badge-status rejete"><i class="bi bi-exclamation-octagon-fill me-1"></i>Exact</span>
+                            {% else %}
+                            <span class="badge-status en-verification"><i class="bi bi-search me-1"></i>Probable</span>
+                            {% endif %}
+                        </td>
+                        <td><span class="fw-semibold">{{ alert.module_label }}</span></td>
+                        <td>
+                            <a href="{{ alert.left_url }}" class="ref-code text-decoration-none">{{ alert.left_reference }}</a>
+                        </td>
+                        <td>
+                            <a href="{{ alert.right_url }}" class="ref-code text-decoration-none">{{ alert.right_reference }}</a>
+                        </td>
+                        <td><span class="metric-meta"><strong>{{ alert.score }}%</strong></span></td>
+                        <td>{{ alert.rule }}</td>
+                        <td>
+                            {% if alert.event_date %}
+                            {{ alert.event_date|date:"d/m/Y" }}
+                            {% else %}
+                            —
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon"><i class="bi bi-shield-check"></i></div>
+            <h5>Aucun doublon détecté</h5>
+            <p>Le module anti-doublon ne signale aucune collision dans votre périmètre.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+</div>
+{% endblock %}

@@ -1,4 +1,4 @@
-# Gest_EtatCivil 🏥
+# Gest_EtatCivil
 
 **Plateforme de gestion des déclarations de naissance**
 
@@ -6,7 +6,7 @@ Application web Django professionnelle permettant de numériser la communication
 
 ---
 
-## 🚀 Installation rapide
+## Installation rapide
 
 ### 1. Prérequis
 - Python 3.10+
@@ -56,7 +56,7 @@ Accédez à : **http://127.0.0.1:8000/**
 
 ---
 
-## 👥 Comptes de démonstration (après `seed_demo`)
+## Comptes de démonstration (après `seed_demo`)
 
 | Rôle | Identifiant | Mot de passe |
 |------|-------------|--------------|
@@ -66,7 +66,7 @@ Accédez à : **http://127.0.0.1:8000/**
 
 ---
 
-## 🏗️ Architecture du projet
+## Architecture du projet
 
 ```
 naissanceplus/          # Configuration Django
@@ -88,34 +88,34 @@ static/css/style.css    # CSS premium personnalisé
 
 ---
 
-## 🔑 Fonctionnalités
+## Fonctionnalités
 
 ### Agent Hôpital
-- ✅ Tableau de bord avec statistiques
-- ✅ Créer une déclaration de naissance (formulaire complet)
-- ✅ Modifier une déclaration en attente
-- ✅ Consulter le statut de ses déclarations
+- Tableau de bord avec statistiques
+- Créer une déclaration de naissance (formulaire complet)
+- Modifier une déclaration en attente
+- Consulter le statut de ses déclarations
 
 ### Agent Mairie
-- ✅ Tableau de bord avec file de travail
-- ✅ Consulter les déclarations reçues
-- ✅ Valider une déclaration → génération automatique de l'acte
-- ✅ Rejeter une déclaration avec motif
-- ✅ Télécharger l'acte de naissance en PDF
+- Tableau de bord avec file de travail
+- Consulter les déclarations reçues
+- Valider une déclaration -> génération automatique de l'acte
+- Rejeter une déclaration avec motif
+- Télécharger l'acte de naissance en PDF
 
 ### Parents
-- ✅ Consulter le statut via référence dossier (sans connexion)
-- ✅ Voir le numéro d'acte si validé
-- ✅ Voir le motif de rejet si rejeté
+- Consulter le statut via référence dossier (sans connexion)
+- Voir le numéro d'acte si validé
+- Voir le motif de rejet si rejeté
 
 ### Administrateur
-- ✅ Tableau de bord global avec statistiques
-- ✅ Gestion complète via l'interface Django Admin
-- ✅ Accès à l'API REST
+- Tableau de bord global avec statistiques
+- Gestion complète via l'interface Django Admin
+- Accès à l'API REST
 
 ---
 
-## 🔌 API REST
+## API REST
 
 Base URL : `/api/`
 
@@ -130,7 +130,7 @@ Base URL : `/api/`
 
 ---
 
-## 📧 Notifications Email
+## Notifications Email
 
 Par défaut, les emails sont affichés dans la console (backend de développement).
 Pour activer l'envoi réel, modifiez `settings.py` :
@@ -143,7 +143,7 @@ EMAIL_HOST_PASSWORD = 'votre-mot-de-passe'
 
 ---
 
-## 🛠️ Technologies
+## Technologies
 
 - **Backend** : Django 4.2, Django REST Framework
 - **Base de données** : SQLite (développement)
@@ -153,4 +153,4 @@ EMAIL_HOST_PASSWORD = 'votre-mot-de-passe'
 
 ---
 
-*Projet de fin d'études — Génie Logiciel | Gest_EtatCivil © 2025*
+*Projet de fin d'études - Génie Logiciel | Gest_EtatCivil (c) 2025*

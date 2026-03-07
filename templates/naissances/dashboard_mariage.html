@@ -6,120 +6,60 @@
 
 {% block header_actions %}
 <a href="{% url 'naissances:mariage_create' %}" class="btn btn-primary btn-sm">
-    <i class="bi bi-plus-circle-fill"></i> Nouveau mariage
+  <i class="bi bi-plus-circle-fill"></i> Nouveau mariage
 </a>
 <a href="{% url 'naissances:mariage_list' %}" class="btn btn-outline-secondary btn-sm">
-    <i class="bi bi-list"></i> Liste complète
+  <i class="bi bi-list"></i> Liste complète
 </a>
 {% endblock %}
 
 {% block content %}
-<section class="hero-strip">
-    <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
-        <div>
-            <div class="hero-kicker">Etat Civil Mariage</div>
-            <h2 class="hero-title">Pilotage des unions et actes de mariage</h2>
-            <p class="hero-meta">Suivez les dossiers, accélérez la validation et gardez une traçabilité claire des décisions.</p>
-        </div>
-        <div class="d-flex flex-wrap gap-2">
-            <span class="glass-chip"><i class="bi bi-heart-fill"></i>Suivi des couples</span>
-            <span class="glass-chip"><i class="bi bi-building-fill"></i>Flux mairies</span>
-        </div>
-    </div>
-</section>
+<div class="dashboard-shell">
+  <section class="hero-strip dashboard-filter-strip">
+    <div class="d-flex flex-wrap align-items-end justify-content-between gap-3">
+      <div>
+        <div class="hero-kicker">Pilotage mariages</div>
+        <h2 class="hero-title mb-1">Dashboard dynamique des unions</h2>
+        <p class="hero-meta">Filtrez la période et le nombre de lignes récentes sans rechargement.</p>
+      </div>
 
-<div class="row g-4">
-    <div class="col-sm-6 col-xl-4">
-        <div class="stat-card primary">
-            <div class="stat-card-icon"><i class="bi bi-heart-fill"></i></div>
-            <div class="stat-value">{{ stats.total }}</div>
-            <div class="stat-label">Total mariages</div>
+      <form id="mariageDashboardFilters"
+            class="header-filter-form dashboard-filter-form"
+            hx-get="{% url 'naissances:mariage_dashboard' %}"
+            hx-target="#dashboard-mariage-content"
+            hx-swap="outerHTML"
+            hx-push-url="false"
+            hx-indicator="#dashboard-mariage-loader"
+            hx-trigger="change from:select delay:200ms, submit">
+        <div class="dashboard-filter-group">
+          <label class="form-label mb-1" for="mariage-dashboard-period">Période</label>
+          <select id="mariage-dashboard-period" class="form-select form-select-sm" name="periode">
+            {% for value, label in period_options %}
+            <option value="{{ value }}" {% if filters.periode == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
         </div>
-    </div>
-    <div class="col-sm-6 col-xl-4">
-        <div class="stat-card success">
-            <div class="stat-card-icon"><i class="bi bi-calendar2-week-fill"></i></div>
-            <div class="stat-value">{{ stats.ce_mois }}</div>
-            <div class="stat-label">Ce mois</div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-4">
-        <div class="stat-card info">
-            <div class="stat-card-icon"><i class="bi bi-people-fill"></i></div>
-            <div class="stat-value">{{ stats.avec_temoins }}</div>
-            <div class="stat-label">Avec témoins renseignés</div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-4">
-        <div class="stat-card warning">
-            <div class="stat-card-icon"><i class="bi bi-hourglass-split"></i></div>
-            <div class="stat-value">{{ stats.en_attente }}</div>
-            <div class="stat-label">En attente</div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-4">
-        <div class="stat-card success">
-            <div class="stat-card-icon"><i class="bi bi-check-circle-fill"></i></div>
-            <div class="stat-value">{{ stats.valides }}</div>
-            <div class="stat-label">Validés</div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-4">
-        <div class="stat-card danger">
-            <div class="stat-card-icon"><i class="bi bi-x-circle-fill"></i></div>
-            <div class="stat-value">{{ stats.rejetes }}</div>
-            <div class="stat-label">Rejetés</div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-4">
-        <div class="stat-card warning">
-            <div class="stat-card-icon"><i class="bi bi-alarm-fill"></i></div>
-            <div class="stat-value">{{ stats.en_retard }}</div>
-            <div class="stat-label">Dossiers en retard</div>
-        </div>
-    </div>
-</div>
 
-<div class="card">
-    <div class="card-header">
-        <h5><i class="bi bi-clock-history me-2"></i>Mariages récents</h5>
-    </div>
-    <div class="card-body p-0">
-        {% if recent %}
-        <div class="table-shell">
-            <table class="table-modern w-100">
-                <thead>
-                    <tr>
-                        <th>Référence</th>
-                        <th>Époux</th>
-                        <th>Épouse</th>
-                        <th>Date</th>
-                        <th>Mairie</th>
-                        <th>Statut</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for d in recent %}
-                    <tr>
-                        <td><a class="ref-code text-decoration-none" href="{% url 'naissances:mariage_detail' d.pk %}">{{ d.reference }}</a></td>
-                        <td>{{ d.nom_epoux }}</td>
-                        <td>{{ d.nom_epouse }}</td>
-                        <td>{{ d.date_mariage|date:"d/m/Y" }}</td>
-                        <td>{{ d.mairie.nom }}</td>
-                        <td>
-                            <span class="badge-status {{ d.statut|lower|cut:'_' }}">{{ d.get_statut_display }}</span>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <div class="dashboard-filter-group">
+          <label class="form-label mb-1" for="mariage-dashboard-limit">Lignes récentes</label>
+          <select id="mariage-dashboard-limit" class="form-select form-select-sm" name="limite">
+            {% for value in limit_options %}
+            <option value="{{ value }}" {% if filters.limite == value %}selected{% endif %}>{{ value }}</option>
+            {% endfor %}
+          </select>
         </div>
-        {% else %}
-        <div class="empty-state">
-            <div class="empty-state-icon">💍</div>
-            <h5>Aucun mariage enregistré</h5>
-        </div>
-        {% endif %}
+
+        <button type="submit" class="btn btn-primary btn-sm">
+          <i class="bi bi-arrow-repeat me-1"></i>Actualiser
+        </button>
+        <span id="dashboard-mariage-loader" class="dashboard-inline-loader htmx-indicator" aria-live="polite">
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          Mise a jour...
+        </span>
+      </form>
     </div>
+  </section>
+
+  {% include 'naissances/partials/dashboard_mariage_content.html' %}
 </div>
 {% endblock %}

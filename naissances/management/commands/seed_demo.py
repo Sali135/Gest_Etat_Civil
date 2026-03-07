@@ -20,7 +20,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         # Message de démarrage lisible en console.
-        self.stdout.write(self.style.MIGRATE_HEADING('🌱 Seeding demo data...'))
+        self.stdout.write(self.style.MIGRATE_HEADING('[START] Seeding demo data...'))
 
         # Create Hospitals
         # get_or_create: idempotent, évite les doublons si relancé.
@@ -32,7 +32,7 @@ class Command(BaseCommand):
             nom='Clinique Sainte Marie',
             defaults={'adresse': 'Rue des Jardins, Plateau, Abidjan', 'contact': '+225 27 22 33 11 22'}
         )
-        self.stdout.write(f'  ✅ Hôpitaux créés: {h1.nom}, {h2.nom}')
+        self.stdout.write(f'  [OK] Hôpitaux créés: {h1.nom}, {h2.nom}')
 
         # Create Mairies
         # Création idempotente des mairies de démo.
@@ -44,7 +44,7 @@ class Command(BaseCommand):
             nom='Mairie du Plateau',
             defaults={'adresse': 'Place de la République, Plateau', 'contact': '+225 27 22 33 44 55', 'ville': 'Plateau'}
         )
-        self.stdout.write(f'  ✅ Mairies créées: {m1.nom}, {m2.nom}')
+        self.stdout.write(f'  [OK] Mairies créées: {m1.nom}, {m2.nom}')
 
         # Create Admin
         # Crée le compte admin seulement s'il n'existe pas déjà.
@@ -57,7 +57,7 @@ class Command(BaseCommand):
                 last_name='Admin',
                 role='ADMIN',
             )
-            self.stdout.write('  ✅ Admin créé: admin / admin123')
+            self.stdout.write('  [OK] Admin créé: admin / admin123')
 
         # Create Hospital Agent
         # Crée un agent hôpital de démo lié à h1.
@@ -71,7 +71,7 @@ class Command(BaseCommand):
                 role='HOPITAL',
                 hopital=h1,
             )
-            self.stdout.write(f'  ✅ Agent hôpital créé: hopital1 / demo1234 ({h1.nom})')
+            self.stdout.write(f'  [OK] Agent hôpital créé: hopital1 / demo1234 ({h1.nom})')
 
         # Create Mairie Agent
         # Crée un agent mairie de démo lié à m1.
@@ -85,12 +85,12 @@ class Command(BaseCommand):
                 role='MAIRIE',
                 mairie=m1,
             )
-            self.stdout.write(f'  ✅ Agent mairie créé: mairie1 / demo1234 ({m1.nom})')
+            self.stdout.write(f'  [OK] Agent mairie créé: mairie1 / demo1234 ({m1.nom})')
 
         # Résumé final pour l'utilisateur.
-        self.stdout.write(self.style.SUCCESS('\n✅ Données de démonstration créées avec succès !'))
-        self.stdout.write('\n📋 Comptes disponibles:')
+        self.stdout.write(self.style.SUCCESS('\n[OK] Données de démonstration créées avec succès !'))
+        self.stdout.write('\n[INFO] Comptes disponibles:')
         self.stdout.write('   admin    / admin123  → Administrateur')
         self.stdout.write('   hopital1 / demo1234  → Agent CHU de Cocody')
         self.stdout.write('   mairie1  / demo1234  → Agent Mairie de Cocody')
-        self.stdout.write('\n🚀 Lancez: python manage.py runserver')
+        self.stdout.write('\n[RUN] Lancez: python manage.py runserver')

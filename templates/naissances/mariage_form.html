@@ -4,7 +4,14 @@
 {% block page_title %}{{ action }} une déclaration de mariage{% endblock %}
 {% block page_subtitle %}Informations des époux et de la célébration{% endblock %}
 
+{% block header_actions %}
+<a href="{% url 'naissances:mariage_list' %}" class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-arrow-left me-1"></i>Retour
+</a>
+{% endblock %}
+
 {% block content %}
+<div class="dashboard-shell">
 <section class="hero-strip">
     <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
         <div>
@@ -12,7 +19,8 @@
             <h2 class="hero-title">{{ action }} une declaration de mariage</h2>
             <p class="hero-meta">Constituez un dossier complet pour validation municipale et emission de l'acte.</p>
         </div>
-        <div class="d-flex flex-wrap gap-2">
+        <div class="d-flex flex-wrap gap-2 hero-chip-group">
+            <span class="glass-chip strong"><i class="bi bi-journal-check"></i>Dossier complet</span>
             <span class="glass-chip"><i class="bi bi-people-fill"></i>Identite des epoux</span>
             <span class="glass-chip"><i class="bi bi-calendar-check-fill"></i>Date officielle</span>
         </div>
@@ -22,7 +30,7 @@
 <form method="post" class="d-grid gap-3">
     {% csrf_token %}
 
-    <div class="form-section">
+    <div class="form-section card-glow">
         <div class="form-section-header"><i class="bi bi-person-fill"></i><h6>Époux</h6></div>
         <div class="form-section-body">
             <div class="row g-3">
@@ -33,7 +41,7 @@
         </div>
     </div>
 
-    <div class="form-section">
+    <div class="form-section card-glow">
         <div class="form-section-header"><i class="bi bi-person-heart"></i><h6>Épouse</h6></div>
         <div class="form-section-body">
             <div class="row g-3">
@@ -44,7 +52,7 @@
         </div>
     </div>
 
-    <div class="form-section">
+    <div class="form-section card-glow">
         <div class="form-section-header"><i class="bi bi-building"></i><h6>Célébration</h6></div>
         <div class="form-section-body">
             <div class="row g-3">
@@ -62,4 +70,5 @@
         <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Enregistrer</button>
     </div>
 </form>
+</div>
 {% endblock %}

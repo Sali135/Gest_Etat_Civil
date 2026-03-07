@@ -1,131 +1,185 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Statut de votre dossier | Gest_EtatCivil</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-<link href="{% static 'css/style.css' %}" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Statut de votre dossier | Gest_EtatCivil</title>
+  <meta name="description" content="Suivez l'état de votre dossier d'état civil avec votre référence officielle.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="{% static 'css/style.css' %}?v=20260304e" rel="stylesheet">
+  <link href="{% static 'css/system/tokens.css' %}?v=20260306a" rel="stylesheet">
+  <link href="{% static 'css/system/components.css' %}?v=20260306a" rel="stylesheet">
+  <link href="{% static 'css/pages/parent_status.css' %}?v=20260306a" rel="stylesheet">
+  <link href="{% static 'css/theme-redesign.css' %}?v=20260306c" rel="stylesheet">
 </head>
-
-<body>
-<div class="status-page">
-  <div class="status-shell fade-in">
-    <aside class="login-side">
-      <div class="cameroon-ribbon mb-3">
-        <span class="c-green"></span><span class="c-red"></span><span class="c-yellow"></span>
-      </div>
-      <h2>Suivi citoyen du dossier</h2>
-      <p>Consultez en toute autonomie l'etat de votre declaration a partir de la reference officielle.</p>
-      <ul class="side-list">
-        <li><i class="bi bi-search"></i>Recherche rapide par reference</li>
-        <li><i class="bi bi-eye"></i>Statut du dossier en direct</li>
-        <li><i class="bi bi-file-earmark-check"></i>Numero d'acte disponible apres validation</li>
-      </ul>
-    </aside>
-
-    <div class="status-card">
-      <div class="login-logo mb-3">
-        <i class="bi bi-building-fill"></i>
-      </div>
-
-      <h1 class="status-title">Consulter votre dossier</h1>
-      <p class="status-subtitle">Entrez la reference fournie par l'hopital</p>
-
-      <form method="post" class="mb-4">
-        {% csrf_token %}
-        <div class="mb-3">{{ form.reference }}</div>
-        {% if form.reference.errors %}
-        <div class="text-danger mb-2 field-error-sm">{{ form.reference.errors.0 }}</div>
-        {% endif %}
-        <button type="submit" class="btn btn-primary w-100 btn-lg">
-          <i class="bi bi-search"></i>Rechercher mon dossier
-        </button>
-      </form>
-
-      {% if error %}
-      <div class="alert alert-danger"><i class="bi bi-x-circle-fill"></i>{{ error }}</div>
-      {% endif %}
-
-      {% if declaration %}
-      <hr class="my-4">
-
-      <div class="text-center mb-4">
-        {% if declaration.statut == "EN_ATTENTE" %}
-        <div class="status-icon en-attente"><i class="bi bi-hourglass-split"></i></div>
-        <h3 class="h5 fw-bold status-title-warn">En cours de traitement</h3>
-        <p class="text-muted small">Votre dossier est en attente de traitement par la mairie.</p>
-        {% elif declaration.statut == "VALIDE" %}
-        <div class="status-icon valide"><i class="bi bi-check-circle-fill"></i></div>
-        <h3 class="h5 fw-bold status-title-success">Declaration validee</h3>
-        <p class="text-muted small">L'acte de naissance a ete genere avec succes.</p>
-        {% else %}
-        <div class="status-icon rejete"><i class="bi bi-x-octagon-fill"></i></div>
-        <h3 class="h5 fw-bold status-title-danger">Declaration rejetee</h3>
-        <p class="text-muted small">Veuillez contacter l'hopital pour plus d'informations.</p>
-        {% endif %}
-      </div>
-
-      <div class="status-grid">
-        <div class="row g-3">
-          <div class="col-sm-6">
-            <div class="info-label">Reference</div>
-            <div class="ref-code">{{ declaration.reference }}</div>
-          </div>
-          <div class="col-sm-6">
-            <div class="info-label">Enfant</div>
-            <div class="fw-semibold">{{ declaration.nom_complet_enfant }}</div>
-          </div>
-          <div class="col-sm-6">
-            <div class="info-label">Date de naissance</div>
-            <div class="fw-semibold">{{ declaration.date_naissance|date:"d/m/Y" }}</div>
-          </div>
-          <div class="col-sm-6">
-            <div class="info-label">Hopital</div>
-            <div class="fw-semibold">{{ declaration.hopital.nom }}</div>
-          </div>
-          <div class="col-sm-6">
-            <div class="info-label">Mairie</div>
-            <div class="fw-semibold">{{ declaration.mairie.nom }}</div>
-          </div>
-          <div class="col-sm-6">
-            <div class="info-label">Depose le</div>
-            <div class="fw-semibold">{{ declaration.date_creation|date:"d/m/Y" }}</div>
-          </div>
-
-          {% if declaration.statut == "VALIDE" %}
-          {% with acte=declaration.acte %}
-          {% if acte %}
-          <div class="col-12">
-            <div class="info-label">Numero d'acte</div>
-            <div class="ref-code">{{ acte.numero_acte }}</div>
-          </div>
-          {% endif %}
-          {% endwith %}
-          {% endif %}
-
-          {% if declaration.statut == "REJETE" and declaration.motif_rejet %}
-          <div class="col-12">
-            <div class="info-label">Motif du rejet</div>
-            <div class="text-reject">{{ declaration.motif_rejet }}</div>
-          </div>
-          {% endif %}
-        </div>
-      </div>
-      {% endif %}
-
-      <div class="text-center mt-4">
-        <a href="{% url 'accounts:login' %}" class="btn btn-outline-secondary btn-sm">
-          <i class="bi bi-box-arrow-in-right"></i>Acces agents
+<body class="ps-page">
+  <header class="ps-topbar">
+    <div class="ps-shell">
+      <div class="ps-topbar-inner">
+        <a href="{% url 'naissances:home_public' %}" class="ps-brand">
+          <span class="ps-brand-badge">
+            <img src="{% static 'img/logo-plateforme-actes-civils-mark.svg' %}" alt="Logo Plateforme Actes Civils">
+          </span>
+          <span>
+            <p class="ps-brand-title">Plateforme Actes Civils</p>
+            <p class="ps-brand-subtitle">Suivi citoyen des dossiers</p>
+          </span>
+        </a>
+        <a href="{% url 'accounts:login' %}" class="ps-login-btn">
+          <i class="bi bi-box-arrow-in-right"></i>Connexion agents
         </a>
       </div>
     </div>
-  </div>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+  </header>
 
+  <main class="ps-shell ps-main">
+    <section class="ps-headline">
+      <p class="ps-kicker">Espace usager</p>
+      <h1 class="ps-title">Suivez l'état de votre dossier en quelques secondes.</h1>
+      <p class="ps-subtitle">
+        Saisissez votre référence officielle pour consulter l’avancement de votre déclaration
+        et vérifier la disponibilité de votre acte.
+      </p>
+    </section>
+
+    <section class="ps-grid">
+      <article class="ps-panel">
+        <div class="ps-panel-head">
+          <h2><i class="bi bi-search me-1"></i>Rechercher un dossier</h2>
+          <p>La référence est fournie lors de la déclaration par l'hôpital ou la mairie.</p>
+        </div>
+        <div class="ps-panel-body">
+          {% if error %}
+          <div class="ps-alert">
+            <i class="bi bi-x-circle-fill"></i>
+            <span>{{ error }}</span>
+          </div>
+          {% endif %}
+          <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label class="form-label" for="{{ form.reference.id_for_label }}">Référence du dossier</label>
+              {{ form.reference }}
+              {% if form.reference.errors %}
+              <div class="text-danger mt-1 field-error-sm">{{ form.reference.errors.0 }}</div>
+              {% endif %}
+            </div>
+            <button type="submit" class="ps-cta">
+              <i class="bi bi-search me-1"></i>Rechercher mon dossier
+            </button>
+          </form>
+          <div class="ps-facts">
+            <div class="ps-fact"><i class="bi bi-check2-circle"></i>Consultation gratuite et immédiate</div>
+            <div class="ps-fact"><i class="bi bi-shield-check"></i>Informations issues du registre officiel</div>
+            <div class="ps-fact"><i class="bi bi-file-earmark-check"></i>Numéro d'acte disponible après validation</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="ps-result">
+        <div class="ps-panel-head">
+          <h2><i class="bi bi-clipboard-check me-1"></i>Résultat du suivi</h2>
+          <p>Visualisez le statut, les informations clés et les prochaines actions.</p>
+        </div>
+        <div class="ps-panel-body">
+          {% if declaration %}
+            {% if declaration.statut == "EN_ATTENTE" %}
+            <div class="ps-state pending">
+              <div class="ps-state-icon"><i class="bi bi-hourglass-split"></i></div>
+              <div>
+                <p class="ps-state-title">Dossier en cours de traitement</p>
+                <p class="ps-state-subtitle">Votre déclaration est en attente de vérification par la mairie.</p>
+              </div>
+            </div>
+            {% elif declaration.statut == "VALIDE" %}
+            <div class="ps-state valid">
+              <div class="ps-state-icon"><i class="bi bi-check-circle-fill"></i></div>
+              <div>
+                <p class="ps-state-title">Déclaration validée</p>
+                <p class="ps-state-subtitle">L'acte officiel est généré et rattaché à votre dossier.</p>
+              </div>
+            </div>
+            {% else %}
+            <div class="ps-state rejected">
+              <div class="ps-state-icon"><i class="bi bi-x-octagon-fill"></i></div>
+              <div>
+                <p class="ps-state-title">Déclaration rejetée</p>
+                <p class="ps-state-subtitle">Consultez le motif et contactez l'établissement concerné.</p>
+              </div>
+            </div>
+            {% endif %}
+
+            <div class="ps-details">
+              <div class="ps-detail">
+                <p class="ps-detail-label">Référence</p>
+                <p class="ps-detail-value ref-code">{{ declaration.reference }}</p>
+              </div>
+              <div class="ps-detail">
+                <p class="ps-detail-label">Enfant</p>
+                <p class="ps-detail-value">{{ declaration.nom_complet_enfant }}</p>
+              </div>
+              <div class="ps-detail">
+                <p class="ps-detail-label">Date de naissance</p>
+                <p class="ps-detail-value">{{ declaration.date_naissance|date:"d/m/Y" }}</p>
+              </div>
+              <div class="ps-detail">
+                <p class="ps-detail-label">Statut</p>
+                <p class="ps-detail-value">{{ declaration.get_statut_display }}</p>
+              </div>
+              <div class="ps-detail">
+                <p class="ps-detail-label">Hôpital déclarant</p>
+                <p class="ps-detail-value">{{ declaration.hopital.nom }}</p>
+              </div>
+              <div class="ps-detail">
+                <p class="ps-detail-label">Mairie destinataire</p>
+                <p class="ps-detail-value">{{ declaration.mairie.nom }}</p>
+              </div>
+              <div class="ps-detail full">
+                <p class="ps-detail-label">Date de dépôt</p>
+                <p class="ps-detail-value">{{ declaration.date_creation|date:"d/m/Y" }}</p>
+              </div>
+              {% if declaration.statut == "VALIDE" %}
+              {% with acte=declaration.acte %}
+              {% if acte %}
+              <div class="ps-detail full">
+                <p class="ps-detail-label">Numéro d'acte</p>
+                <p class="ps-detail-value ref-code">{{ acte.numero_acte }}</p>
+              </div>
+              {% endif %}
+              {% endwith %}
+              {% endif %}
+            </div>
+
+            {% if declaration.statut == "REJETE" and declaration.motif_rejet %}
+            <div class="ps-reject">
+              <strong>Motif du rejet :</strong><br>
+              {{ declaration.motif_rejet }}
+            </div>
+            {% endif %}
+          {% else %}
+            <div class="ps-result-empty">
+              <div>
+                <i class="bi bi-search-heart"></i>
+                <h3 class="h5 mb-2">Aucun dossier affiché pour le moment</h3>
+                <p class="mb-0">Entrez votre référence pour voir immédiatement l'état de votre déclaration.</p>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <footer class="ps-footer">
+    <div class="ps-shell">
+      Gest_EtatCivil · Service numérique de suivi des actes d'état civil
+    </div>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>

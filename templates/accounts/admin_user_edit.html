@@ -4,7 +4,14 @@
 {% block page_title %}Modifier utilisateur{% endblock %}
 {% block page_subtitle %}{{ target.username }}{% endblock %}
 
+{% block header_actions %}
+<a href="{% url 'accounts:admin_users' %}" class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-arrow-left me-1"></i>Retour
+</a>
+{% endblock %}
+
 {% block content %}
+<div class="dashboard-shell">
 <section class="hero-strip">
     <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
         <div>
@@ -12,7 +19,8 @@
             <h2 class="hero-title">Modifier le profil utilisateur</h2>
             <p class="hero-meta">Ajustez les informations et les droits d'acces du compte selectionne.</p>
         </div>
-        <div class="d-flex flex-wrap gap-2">
+        <div class="d-flex flex-wrap gap-2 hero-chip-group">
+            <span class="glass-chip strong"><i class="bi bi-person-badge"></i>{{ target.get_role_display }}</span>
             <span class="glass-chip"><i class="bi bi-person-gear"></i>Mise a jour securisee</span>
         </div>
     </div>
@@ -41,5 +49,6 @@
             </div>
         </form>
     </div>
+</div>
 </div>
 {% endblock %}

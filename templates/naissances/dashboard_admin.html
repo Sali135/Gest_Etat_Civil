@@ -6,297 +6,202 @@
 
 {% block header_actions %}
 <a href="/admin/" class="btn btn-primary btn-sm">
-    <i class="bi bi-shield-fill-check me-1"></i>Interface Admin
+  <i class="bi bi-shield-fill-check me-1"></i>Interface Admin
 </a>
 {% endblock %}
 
 {% block content %}
-<section class="hero-strip">
-    <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
-        <div>
-            <div class="hero-kicker">Vue Administration</div>
-            <h2 class="hero-title">Supervision globale du systeme</h2>
-            <p class="hero-meta">Controlez la performance des hopitaux et mairies avec une lecture immediate des indicateurs.</p>
-        </div>
-        <div class="d-flex flex-wrap gap-2">
-            <span class="glass-chip"><i class="bi bi-bar-chart-line"></i>Indicateurs consolides</span>
-            <span class="glass-chip"><i class="bi bi-diagram-3"></i>Vision multi-etablissements</span>
-        </div>
-    </div>
-</section>
+<div class="dashboard-shell">
+  <section class="hero-strip dashboard-filter-strip">
+    <div class="d-flex flex-wrap align-items-end justify-content-between gap-3">
+      <div>
+        <div class="hero-kicker">Pilotage dynamique</div>
+        <h2 class="hero-title mb-1">Analyse en temps reel</h2>
+        <p class="hero-meta">Ajustez la période et le volume pour actualiser les indicateurs sans recharger la page.</p>
+      </div>
 
-<!-- Stats Row -->
-<div class="row g-4 mb-4">
-    <div class="col-sm-6 col-xl-3">
-        <div class="stat-card primary">
-            <div class="stat-card-icon"><i class="bi bi-file-earmark-text-fill"></i></div>
-            <div class="stat-value">{{ stats.total }}</div>
-            <div class="stat-label">Total déclarations</div>
+      <form id="adminDashboardFilters"
+            class="header-filter-form dashboard-filter-form"
+            hx-get="{% url 'naissances:dashboard_admin' %}"
+            hx-target="#dashboard-admin-content"
+            hx-swap="outerHTML"
+            hx-push-url="false"
+            hx-indicator="#dashboard-admin-loader"
+            hx-trigger="change from:select delay:200ms, submit">
+        <div class="dashboard-filter-group">
+          <label class="form-label mb-1" for="dashboard-period">Période</label>
+          <select id="dashboard-period" class="form-select form-select-sm" name="periode">
+            {% for value, label in period_options %}
+            <option value="{{ value }}" {% if filters.periode == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
         </div>
-    </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="stat-card warning">
-            <div class="stat-card-icon"><i class="bi bi-hourglass-split"></i></div>
-            <div class="stat-value">{{ stats.en_attente }}</div>
-            <div class="stat-label">En attente</div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="stat-card success">
-            <div class="stat-card-icon"><i class="bi bi-check-circle-fill"></i></div>
-            <div class="stat-value">{{ stats.valides }}</div>
-            <div class="stat-label">Validées</div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="stat-card danger">
-            <div class="stat-card-icon"><i class="bi bi-x-circle-fill"></i></div>
-            <div class="stat-value">{{ stats.rejetes }}</div>
-            <div class="stat-label">Rejetées</div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="stat-card teal">
-            <div class="stat-card-icon"><i class="bi bi-hospital-fill"></i></div>
-            <div class="stat-value">{{ stats.hopitaux }}</div>
-            <div class="stat-label">Hôpitaux</div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="stat-card info">
-            <div class="stat-card-icon"><i class="bi bi-building-fill"></i></div>
-            <div class="stat-value">{{ stats.mairies }}</div>
-            <div class="stat-label">Mairies</div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="stat-card success">
-            <div class="stat-card-icon"><i class="bi bi-heart-fill"></i></div>
-            <div class="stat-value">{{ stats.mariages }}</div>
-            <div class="stat-label">Mariages</div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="stat-card danger">
-            <div class="stat-card-icon"><i class="bi bi-file-earmark-x-fill"></i></div>
-            <div class="stat-value">{{ stats.deces }}</div>
-            <div class="stat-label">Décès</div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="stat-card warning">
-            <div class="stat-card-icon"><i class="bi bi-alarm-fill"></i></div>
-            <div class="stat-value">{{ stats.en_retard }}</div>
-            <div class="stat-label">Naissances en retard</div>
-        </div>
-    </div>
-</div>
 
-<!-- ─── Charts Row ─── -->
-<div class="row g-4 mb-4">
-    <div class="col-lg-4">
-        <div class="card h-100">
-            <div class="card-header">
-                <h5><i class="bi bi-pie-chart-fill me-2"></i>Repartition des statuts</h5>
-            </div>
-            <div class="card-body chart-holder">
-                <canvas id="donutChart"></canvas>
-            </div>
+        <div class="dashboard-filter-group">
+          <label class="form-label mb-1" for="dashboard-limit">Lignes récentes</label>
+          <select id="dashboard-limit" class="form-select form-select-sm" name="limite">
+            {% for value in limit_options %}
+            <option value="{{ value }}" {% if filters.limite == value %}selected{% endif %}>{{ value }}</option>
+            {% endfor %}
+          </select>
         </div>
-    </div>
-    <div class="col-lg-8">
-        <div class="card h-100">
-            <div class="card-header">
-                <h5><i class="bi bi-bar-chart-fill me-2"></i>Performance par hopital</h5>
-            </div>
-            <div class="card-body chart-holder">
-                <canvas id="barChart"></canvas>
-            </div>
-        </div>
-    </div>
-</div>
 
-<div class="row g-4">
-    <!-- Hospitals Stats -->
-    <div class="col-lg-6">
-        <div class="card h-100">
-            <div class="card-header">
-                <h5><i class="bi bi-hospital-fill me-2"></i>Activite par hopital</h5>
-            </div>
-            <div class="card-body p-0">
-                {% if hopitaux_stats %}
-                <div class="table-shell">
-                <table class="table-modern w-100">
-                    <thead>
-                        <tr>
-                            <th>Hôpital</th>
-                            <th class="text-center">Déclarations</th>
-                            <th class="text-center">Validées</th>
-                            <th>Taux</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for h in hopitaux_stats %}
-                        <tr>
-                            <td class="table-emphasis">{{ h.nom }}</td>
-                            <td class="text-center">{{ h.nb_declarations }}</td>
-                            <td class="text-center table-positive">{{ h.nb_valides }}</td>
-                            <td>
-                                {% if h.nb_declarations > 0 %}
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="progress-bar-custom flex-grow-1">
-                                        <div class="progress-bar-fill progress-fill-success"
-                                            style="width:{% widthratio h.nb_valides h.nb_declarations 100 %}%;">
-                                        </div>
-                                    </div>
-                                    <span class="percent-soft">{% widthratio
-                                        h.nb_valides h.nb_declarations 100 %}%</span>
-                                </div>
-                                {% else %}—{% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                </div>
-                {% else %}
-                <div class="empty-state">
-                    <div class="empty-state-icon"></div>
-                    <h5>Aucun hôpital enregistré</h5>
-                </div>
-                {% endif %}
-            </div>
-        </div>
+        <button type="submit" class="btn btn-primary btn-sm">
+          <i class="bi bi-arrow-repeat me-1"></i>Actualiser
+        </button>
+        <span id="dashboard-admin-loader" class="dashboard-inline-loader htmx-indicator" aria-live="polite">
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          Mise a jour...
+        </span>
+      </form>
     </div>
+  </section>
 
-    <!-- Recent Declarations -->
-    <div class="col-lg-6">
-        <div class="card h-100">
-            <div class="card-header">
-                <h5><i class="bi bi-clock-history me-2"></i>Activite recente</h5>
-                <a href="{% url 'naissances:declaration_list' %}" class="btn btn-outline-secondary btn-sm">Voir tout</a>
-            </div>
-            <div class="card-body p-0">
-                {% if recent %}
-                <div class="table-shell">
-                <table class="table-modern w-100">
-                    <thead>
-                        <tr>
-                            <th>Référence</th>
-                            <th>Enfant</th>
-                            <th>Statut</th>
-                            <th>Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for d in recent %}
-                        <tr>
-                            <td>
-                                <a href="{% url 'naissances:declaration_detail' d.pk %}"
-                                    class="ref-code text-decoration-none">
-                                    {{ d.reference }}
-                                </a>
-                            </td>
-                            <td><span class="fw-semibold">{{ d.nom_enfant }}</span></td>
-                            <td>
-                                <span class="badge-status {{ d.statut|lower|cut:'_' }}">
-                                    {{ d.get_statut_display }}
-                                </span>
-                            </td>
-                            <td><span class="text-soft">{{ d.date_creation|date:"d/m/Y" }}</span></td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                </div>
-                {% else %}
-                <div class="empty-state">
-                    <div class="empty-state-icon">📋</div>
-                    <h5>Aucune déclaration</h5>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
+  {% include 'naissances/partials/dashboard_admin_content.html' %}
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 <script>
-    // ─── Donut Chart : Répartition des statuts ───
-    const donutCtx = document.getElementById('donutChart');
-    if (donutCtx) {
-        new Chart(donutCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['En attente', 'Validées', 'Rejetées'],
-                datasets: [{
-                    data: [{{ stats.en_attente }}, {{ stats.valides }}, {{ stats.rejetes }}],
-        backgroundColor: ['rgba(244,166,42,0.85)', 'rgba(31,159,111,0.85)', 'rgba(212,71,71,0.85)'],
-        borderColor: ['#f4a62a', '#1f9f6f', '#d44747'],
-            borderWidth: 2,
-                hoverOffset: 6,
-        }]
-      },
-    options: {
-        cutout: '68%',
-            responsive: true,
-                maintainAspectRatio: false,
-                    plugins: {
-            legend: { position: 'bottom', labels: { padding: 16, font: { family: 'Manrope', size: 12 } } },
-            tooltip: {
-                callbacks: {
-                    label: ctx => ` ${ctx.label} : ${ctx.parsed} déclaration(s)`
-                }
-            }
-        }
+  (function () {
+    const chartStore = window.__dashboardAdminCharts || (window.__dashboardAdminCharts = {});
+
+    function destroyChart(key) {
+      if (!chartStore[key]) return;
+      chartStore[key].destroy();
+      chartStore[key] = null;
     }
-    });
-  }
 
-    // ─── Bar Chart : Activité par hôpital ───
-    const barCtx = document.getElementById('barChart');
-    if (barCtx) {
-    const labels = [{% for h in hopitaux_stats %}'{{ h.nom|truncatechars:18 }}'{% if not forloop.last %}, {% endif %}{% endfor %}];
-    const totaux = [{% for h in hopitaux_stats %}{{ h.nb_declarations }}{% if not forloop.last %}, {% endif %}{% endfor %}];
-    const valides = [{% for h in hopitaux_stats %}{{ h.nb_valides }}{% if not forloop.last %}, {% endif %}{% endfor %}];
+    function getChartPayload() {
+      const payloadTag = document.getElementById('dashboard-admin-chart-data');
+      if (!payloadTag) return null;
+      try {
+        return JSON.parse(payloadTag.textContent || '{}');
+      } catch (error) {
+        return null;
+      }
+    }
 
-    new Chart(barCtx, {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [
-                {
-                    label: 'Déclarations',
-                    data: totaux,
-                    backgroundColor: 'rgba(27,70,106,0.8)',
-                    borderColor: '#3f5d4c',
-                    borderWidth: 1.5,
-                    borderRadius: 6,
-                },
-                {
-                    label: 'Validées',
-                    data: valides,
-                    backgroundColor: 'rgba(31,159,111,0.8)',
-                    borderColor: '#1f9f6f',
-                    borderWidth: 1.5,
-                    borderRadius: 6,
-                }
-            ]
-        },
-        options: {
+    function normalizeLabel(label, maxLength) {
+      if (!label) return '';
+      if (label.length <= maxLength) return label;
+      return label.slice(0, maxLength - 1) + '…';
+    }
+
+    window.initDashboardAdminCharts = function initDashboardAdminCharts() {
+      if (typeof Chart === 'undefined') return;
+      const payload = getChartPayload();
+      if (!payload) return;
+
+      destroyChart('donut');
+      destroyChart('bar');
+
+      const donutCtx = document.getElementById('donutChart');
+      if (donutCtx) {
+        chartStore.donut = new Chart(donutCtx, {
+          type: 'doughnut',
+          data: {
+            labels: ['En attente', 'Validées', 'Rejetées'],
+            datasets: [{
+              data: payload.statuses || [0, 0, 0],
+              backgroundColor: ['rgba(232, 190, 132, 0.84)', 'rgba(129, 191, 162, 0.84)', 'rgba(219, 161, 161, 0.84)'],
+              borderColor: ['#deba89', '#8cbda5', '#d7a5a5'],
+              borderWidth: 1.5,
+              hoverOffset: 4
+            }]
+          },
+          options: {
+            cutout: '68%',
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { position: 'top', labels: { font: { family: 'Manrope', size: 12 }, padding: 12 } }
+              legend: {
+                position: 'bottom',
+                labels: {
+                  padding: 16,
+                  font: { family: 'Space Grotesk', size: 12 },
+                  color: '#4f6478'
+                }
+              },
+              tooltip: {
+                callbacks: {
+                  label: function (context) {
+                    return ' ' + context.label + ' : ' + context.parsed + ' déclaration(s)';
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      const barCtx = document.getElementById('barChart');
+      if (barCtx) {
+        const labels = (payload.hospital_labels || []).map(function (label) {
+          return normalizeLabel(label, 18);
+        });
+        chartStore.bar = new Chart(barCtx, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: 'Déclarations',
+                data: payload.hospital_totals || [],
+                backgroundColor: 'rgba(121, 161, 199, 0.82)',
+                borderColor: '#7ca3c8',
+                borderWidth: 1.25,
+                borderRadius: 6
+              },
+              {
+                label: 'Validées',
+                data: payload.hospital_valides || [],
+                backgroundColor: 'rgba(133, 190, 165, 0.82)',
+                borderColor: '#8abfa6',
+                borderWidth: 1.25,
+                borderRadius: 6
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'top',
+                labels: {
+                  font: { family: 'Space Grotesk', size: 12 },
+                  padding: 12,
+                  color: '#4f6478'
+                }
+              }
             },
             scales: {
-                y: { beginAtZero: true, ticks: { precision: 0, font: { family: 'Manrope' } }, grid: { color: '#e8eddc' } },
-                x: { ticks: { font: { family: 'Manrope', size: 11 } }, grid: { display: false } }
+              y: {
+                beginAtZero: true,
+                ticks: { precision: 0, font: { family: 'Space Grotesk' }, color: '#617488' },
+                grid: { color: '#e7eff7' }
+              },
+              x: {
+                ticks: { font: { family: 'Space Grotesk', size: 11 } },
+                grid: { display: false }
+              }
             }
-        }
+          }
+        });
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', function () {
+      window.initDashboardAdminCharts();
     });
-  }
+
+    document.body.addEventListener('htmx:afterSwap', function (event) {
+      if (event.target && event.target.id === 'dashboard-admin-content') {
+        window.initDashboardAdminCharts();
+      }
+    });
+  })();
 </script>
 {% endblock %}

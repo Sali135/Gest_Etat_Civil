@@ -4,7 +4,14 @@
 {% block page_title %}{{ action }} une déclaration de décès{% endblock %}
 {% block page_subtitle %}Informations du défunt et du déclarant{% endblock %}
 
+{% block header_actions %}
+<a href="{% url 'naissances:deces_list' %}" class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-arrow-left me-1"></i>Retour
+</a>
+{% endblock %}
+
 {% block content %}
+<div class="dashboard-shell">
 <section class="hero-strip">
     <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
         <div>
@@ -12,7 +19,8 @@
             <h2 class="hero-title">{{ action }} une declaration de deces</h2>
             <p class="hero-meta">Formalisez le dossier avec precision pour une delivrance rapide et conforme de l'acte.</p>
         </div>
-        <div class="d-flex flex-wrap gap-2">
+        <div class="d-flex flex-wrap gap-2 hero-chip-group">
+            <span class="glass-chip strong"><i class="bi bi-journal-check"></i>Dossier complet</span>
             <span class="glass-chip"><i class="bi bi-file-earmark-text-fill"></i>Informations officielles</span>
             <span class="glass-chip"><i class="bi bi-building-fill"></i>Traitement mairie</span>
         </div>
@@ -22,7 +30,7 @@
 <form method="post" class="d-grid gap-3">
     {% csrf_token %}
 
-    <div class="form-section">
+    <div class="form-section card-glow">
         <div class="form-section-header"><i class="bi bi-person-fill"></i><h6>Défunt</h6></div>
         <div class="form-section-body">
             <div class="row g-3">
@@ -37,7 +45,7 @@
         </div>
     </div>
 
-    <div class="form-section">
+    <div class="form-section card-glow">
         <div class="form-section-header"><i class="bi bi-person-badge"></i><h6>Déclarant & administration</h6></div>
         <div class="form-section-body">
             <div class="row g-3">
@@ -55,4 +63,5 @@
         <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Enregistrer</button>
     </div>
 </form>
+</div>
 {% endblock %}

@@ -1,0 +1,29 @@
+<svg width="420" height="560" viewBox="0 0 420 560" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Logo Plateforme Actes Civils">
+  <defs>
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7AB7E6"/>
+      <stop offset="55%" stop-color="#2C7FC2"/>
+      <stop offset="100%" stop-color="#1A5D96"/>
+    </linearGradient>
+    <linearGradient id="paperGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#E8F0F8"/>
+    </linearGradient>
+    <filter id="drop" x="-20%" y="-20%" width="140%" height="160%">
+      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#103B61" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#drop)">
+    <path d="M210 62C172 92 131 95 98 92V194C98 281 148 349 210 381C272 349 322 281 322 194V92C289 95 248 92 210 62Z" fill="url(#shieldGrad)"/>
+    <path d="M210 398L171 379C184 389 197 396 210 401C223 396 236 389 249 379L210 398Z" fill="#174E7D" opacity="0.85"/>
+  </g>
+
+  <rect x="146" y="126" width="132" height="152" rx="14" fill="url(#paperGrad)" stroke="#C9DAEA" stroke-width="4"/>
+  <path d="M278 154L252 126H234V154H278Z" fill="#D7E4F0"/>
+  <path d="M177 207L197 227L243 181" fill="none" stroke="#214765" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <text x="210" y="462" text-anchor="middle" font-family="Space Grotesk, Plus Jakarta Sans, Arial, sans-serif" font-size="52" font-weight="700" fill="#223B5A">Plateforme</text>
+  <text x="210" y="503" text-anchor="middle" font-family="Space Grotesk, Plus Jakarta Sans, Arial, sans-serif" font-size="34" letter-spacing="3" font-weight="700" fill="#8F9DB0">ACTES CIVILS</text>
+  <text x="210" y="532" text-anchor="middle" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="15" fill="#7A8798">Fiabilite, modernite, accessibilite</text>
+</svg>

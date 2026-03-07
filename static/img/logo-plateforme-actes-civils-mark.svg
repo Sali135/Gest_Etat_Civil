@@ -1,0 +1,18 @@
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Icône Plateforme Actes Civils">
+  <defs>
+    <linearGradient id="markShieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7AB7E6"/>
+      <stop offset="55%" stop-color="#2C7FC2"/>
+      <stop offset="100%" stop-color="#1A5D96"/>
+    </linearGradient>
+    <linearGradient id="markPaperGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#E8F0F8"/>
+    </linearGradient>
+  </defs>
+
+  <path d="M128 20C104 38 79 40 58 39V101C58 154 89 197 128 217C167 197 198 154 198 101V39C177 40 152 38 128 20Z" fill="url(#markShieldGrad)"/>
+  <rect x="89" y="63" width="78" height="94" rx="10" fill="url(#markPaperGrad)" stroke="#C9DAEA" stroke-width="3"/>
+  <path d="M167 80L152 63H141V80H167Z" fill="#D7E4F0"/>
+  <path d="M108 112L120 124L147 97" fill="none" stroke="#214765" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

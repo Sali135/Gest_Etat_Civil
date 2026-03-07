@@ -126,6 +126,166 @@ class WorkflowSecurityTests(TestCase):
         response = self.client.get(reverse('api:stats'))
         self.assertEqual(response.status_code, 403)
 
+    def test_admin_dashboard_htmx_returns_partial_with_filters(self):
+        admin_user = User.objects.create_user(
+            username='admin_dashboard_htmx',
+            password='testpass123',
+            role='ADMIN',
+        )
+        DeclarationNaissance.objects.create(
+            nom_enfant='Kaba',
+            prenom_enfant='Noe',
+            date_naissance='2026-01-05',
+            lieu_naissance='Hopital Central',
+            sexe='M',
+            nom_pere='Jean Kaba',
+            nom_mere='Maya Kaba',
+            hopital=self.hopital,
+            mairie=self.mairie,
+            statut=DeclarationNaissance.Statut.VALIDE,
+        )
+
+        self.client.login(username='admin_dashboard_htmx', password='testpass123')
+        response = self.client.get(
+            reverse('naissances:dashboard_admin'),
+            {'periode': '30', 'limite': '5'},
+            HTTP_HX_REQUEST='true',
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'naissances/partials/dashboard_admin_content.html')
+        self.assertContains(response, 'id="dashboard-admin-content"', html=False)
+        self.assertContains(response, 'dashboard-admin-chart-data')
+        self.assertEqual(response.context['filters']['periode'], '30')
+        self.assertEqual(response.context['filters']['limite'], 5)
+
+    def test_hopital_dashboard_htmx_returns_partial_with_filters(self):
+        hopital_user = User.objects.create_user(
+            username='hopital_dashboard_htmx',
+            password='testpass123',
+            role='HOPITAL',
+            hopital=self.hopital,
+        )
+        DeclarationNaissance.objects.create(
+            nom_enfant='Mina',
+            prenom_enfant='Kai',
+            date_naissance='2026-01-08',
+            lieu_naissance='Maternite A',
+            sexe='F',
+            nom_pere='Paul Mina',
+            nom_mere='Anne Mina',
+            hopital=self.hopital,
+            mairie=self.mairie,
+            statut=DeclarationNaissance.Statut.EN_ATTENTE,
+        )
+
+        self.client.login(username='hopital_dashboard_htmx', password='testpass123')
+        response = self.client.get(
+            reverse('naissances:dashboard_hopital'),
+            {'periode': '30', 'limite': '5'},
+            HTTP_HX_REQUEST='true',
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'naissances/partials/dashboard_hopital_content.html')
+        self.assertContains(response, 'id="dashboard-hopital-content"', html=False)
+        self.assertEqual(response.context['filters']['periode'], '30')
+        self.assertEqual(response.context['filters']['limite'], 5)
+
+    def test_mairie_dashboard_htmx_returns_partial_with_filters(self):
+        mairie_user = User.objects.create_user(
+            username='mairie_dashboard_htmx',
+            password='testpass123',
+            role='MAIRIE',
+            mairie=self.mairie,
+        )
+        DeclarationNaissance.objects.create(
+            nom_enfant='Mina',
+            prenom_enfant='Noa',
+            date_naissance='2026-01-09',
+            lieu_naissance='Maternite A',
+            sexe='M',
+            nom_pere='Paul Mina',
+            nom_mere='Anne Mina',
+            hopital=self.hopital,
+            mairie=self.mairie,
+            statut=DeclarationNaissance.Statut.EN_ATTENTE,
+        )
+
+        self.client.login(username='mairie_dashboard_htmx', password='testpass123')
+        response = self.client.get(
+            reverse('naissances:dashboard_mairie'),
+            {'periode': '30', 'limite': '5'},
+            HTTP_HX_REQUEST='true',
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'naissances/partials/dashboard_mairie_content.html')
+        self.assertContains(response, 'id="dashboard-mairie-content"', html=False)
+        self.assertEqual(response.context['filters']['periode'], '30')
+        self.assertEqual(response.context['filters']['limite'], 5)
+
+    def test_mariage_dashboard_htmx_returns_partial_with_filters(self):
+        mairie_user = User.objects.create_user(
+            username='mairie_dashboard_mariage_htmx',
+            password='testpass123',
+            role='MAIRIE',
+            mairie=self.mairie,
+        )
+        DeclarationMariage.objects.create(
+            nom_epoux='Paul Test',
+            nom_epouse='Anne Test',
+            date_mariage='2026-01-10',
+            lieu_mariage='Salle des fêtes',
+            mairie=self.mairie,
+            statut=DeclarationMariage.Statut.EN_ATTENTE,
+        )
+
+        self.client.login(username='mairie_dashboard_mariage_htmx', password='testpass123')
+        response = self.client.get(
+            reverse('naissances:mariage_dashboard'),
+            {'periode': '30', 'limite': '5'},
+            HTTP_HX_REQUEST='true',
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'naissances/partials/dashboard_mariage_content.html')
+        self.assertContains(response, 'id="dashboard-mariage-content"', html=False)
+        self.assertEqual(response.context['filters']['periode'], '30')
+        self.assertEqual(response.context['filters']['limite'], 5)
+
+    def test_deces_dashboard_htmx_returns_partial_with_filters(self):
+        mairie_user = User.objects.create_user(
+            username='mairie_dashboard_deces_htmx',
+            password='testpass123',
+            role='MAIRIE',
+            mairie=self.mairie,
+        )
+        DeclarationDeces.objects.create(
+            nom_defunt='Doe',
+            prenom_defunt='John',
+            sexe='M',
+            date_deces='2026-01-11',
+            lieu_deces='Hopital Central',
+            declarant_nom='Jane Doe',
+            hopital=self.hopital,
+            mairie=self.mairie,
+            statut=DeclarationDeces.Statut.EN_ATTENTE,
+        )
+
+        self.client.login(username='mairie_dashboard_deces_htmx', password='testpass123')
+        response = self.client.get(
+            reverse('naissances:deces_dashboard'),
+            {'periode': '30', 'limite': '5'},
+            HTTP_HX_REQUEST='true',
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'naissances/partials/dashboard_deces_content.html')
+        self.assertContains(response, 'id="dashboard-deces-content"', html=False)
+        self.assertEqual(response.context['filters']['periode'], '30')
+        self.assertEqual(response.context['filters']['limite'], 5)
+
     def test_naissance_form_rejects_future_birth_date(self):
         # Cas: date naissance future refusée par validation formulaire.
         future_date = timezone.localdate() + timedelta(days=1)
@@ -234,3 +394,79 @@ class WorkflowSecurityTests(TestCase):
         response = self.client.post(reverse('naissances:deces_valider', kwargs={'pk': declaration.pk}))
         self.assertEqual(response.status_code, 302)
         self.assertTrue(mock_send_mail.called)
+
+    def test_duplicates_dashboard_lists_exact_duplicates_for_mairie(self):
+        mairie_user = User.objects.create_user(
+            username='agent_mairie_duplicates',
+            password='testpass123',
+            role='MAIRIE',
+            mairie=self.mairie,
+        )
+        d1 = DeclarationNaissance.objects.create(
+            nom_enfant='Kouassi',
+            prenom_enfant='Nina',
+            date_naissance='2026-02-12',
+            lieu_naissance='Maternite Centrale',
+            sexe='F',
+            nom_pere='Kouassi Paul',
+            nom_mere='Awa Nina',
+            hopital=self.hopital,
+            mairie=self.mairie,
+        )
+        d2 = DeclarationNaissance.objects.create(
+            nom_enfant='Kouassi',
+            prenom_enfant='Nina',
+            date_naissance='2026-02-12',
+            lieu_naissance='Maternite Centrale',
+            sexe='F',
+            nom_pere='Kouassi Paul',
+            nom_mere='Awa Nina',
+            hopital=self.hopital,
+            mairie=self.mairie,
+        )
+
+        self.client.login(username='agent_mairie_duplicates', password='testpass123')
+        response = self.client.get(reverse('naissances:duplicates_dashboard'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Contrôle anti-doublons')
+        self.assertContains(response, d1.reference)
+        self.assertContains(response, d2.reference)
+        self.assertContains(response, 'Exact')
+
+    def test_naissance_create_shows_duplicate_warning(self):
+        hopital_user = User.objects.create_user(
+            username='agent_hopital_duplicates',
+            password='testpass123',
+            role='HOPITAL',
+            hopital=self.hopital,
+        )
+        DeclarationNaissance.objects.create(
+            nom_enfant='Bamba',
+            prenom_enfant='Aya',
+            date_naissance='2026-02-15',
+            lieu_naissance='Maternite A',
+            sexe='F',
+            nom_pere='Koffi Bamba',
+            nom_mere='Awa Bamba',
+            hopital=self.hopital,
+            mairie=self.mairie,
+        )
+
+        self.client.login(username='agent_hopital_duplicates', password='testpass123')
+        response = self.client.post(
+            reverse('naissances:declaration_create'),
+            data={
+                'nom_enfant': 'Bamba',
+                'prenom_enfant': 'Aya',
+                'sexe': 'F',
+                'date_naissance': '2026-02-15',
+                'lieu_naissance': 'Maternite A',
+                'nom_pere': 'Koffi Bamba',
+                'nom_mere': 'Awa Bamba',
+                'mairie': self.mairie.id,
+            },
+            follow=True,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(DeclarationNaissance.objects.count(), 2)
+        self.assertContains(response, 'Alerte anti-doublon (naissance)')

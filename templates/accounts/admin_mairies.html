@@ -5,6 +5,7 @@
 {% block page_subtitle %}Ajouter et consulter les mairies de la plateforme{% endblock %}
 
 {% block content %}
+<div class="dashboard-shell">
 <section class="hero-strip">
     <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
         <div>
@@ -12,7 +13,8 @@
             <h2 class="hero-title">Gestion du reseau communal</h2>
             <p class="hero-meta">Maintenez le referentiel des mairies et supervisez les operations d'administration.</p>
         </div>
-        <div class="d-flex flex-wrap gap-2">
+        <div class="d-flex flex-wrap gap-2 hero-chip-group">
+            <span class="glass-chip strong"><i class="bi bi-buildings"></i>{{ page_obj.paginator.count }} mairie{{ page_obj.paginator.count|pluralize }}</span>
             <span class="glass-chip"><i class="bi bi-buildings-fill"></i>Referentiel territorial</span>
             <span class="glass-chip"><i class="bi bi-geo-alt-fill"></i>Villes et contacts</span>
         </div>
@@ -47,10 +49,10 @@
     </div>
 
     <div class="col-lg-8">
-        <div class="card card-glow">
+        <div class="card dashboard-card card-glow">
             <div class="card-header">
                 <h5><i class="bi bi-buildings-fill me-2"></i>Mairies</h5>
-                <form method="get" class="d-flex gap-2">
+                <form method="get" class="header-filter-form">
                     <input type="text" name="q" value="{{ search }}" class="form-control form-control-sm"
                         placeholder="Rechercher...">
                     <input type="text" name="ville" value="{{ ville_filter }}" class="form-control form-control-sm"
@@ -59,7 +61,7 @@
                 </form>
             </div>
             <div class="card-body p-0">
-                <div class="table-shell">
+                <div class="table-shell elevated">
                     <table class="table-modern w-100">
                         <thead>
                             <tr>
@@ -129,12 +131,12 @@
     </div>
 </div>
 
-<div class="card card-glow mt-4">
+<div class="card dashboard-card card-glow">
     <div class="card-header">
         <h5><i class="bi bi-clock-history me-2"></i>Journal des actions admin</h5>
     </div>
     <div class="card-body p-0">
-        <div class="table-shell">
+        <div class="table-shell elevated">
             <table class="table-modern w-100">
                 <thead>
                     <tr>
@@ -161,5 +163,6 @@
             </table>
         </div>
     </div>
+</div>
 </div>
 {% endblock %}

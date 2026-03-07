@@ -15,6 +15,33 @@ from django.db.models import F, Q
 from django.utils import timezone
 
 
+def _build_unique_act_number(model_cls, prefix, random_size=8, max_attempts=5):
+    """Generate a unique act number with bounded collision retries."""
+    year = timezone.now().year
+    for _ in range(max_attempts):
+        candidate = f"{prefix}-{year}-{uuid.uuid4().hex[:random_size].upper()}"
+        if not model_cls.objects.filter(numero_acte=candidate).exists():
+            return candidate
+    return f"{prefix}-{year}-{uuid.uuid4().hex[:12].upper()}"
+
+
+class _ActeNumberMixin:
+    """Shared number assignment logic for acte models."""
+    ACT_NUMBER_PREFIX = ''
+    ACT_NUMBER_RANDOM_SIZE = 8
+    ACT_NUMBER_MAX_ATTEMPTS = 5
+
+    def _ensure_numero_acte(self):
+        if self.numero_acte:
+            return
+        self.numero_acte = _build_unique_act_number(
+            type(self),
+            prefix=self.ACT_NUMBER_PREFIX,
+            random_size=self.ACT_NUMBER_RANDOM_SIZE,
+            max_attempts=self.ACT_NUMBER_MAX_ATTEMPTS,
+        )
+
+
 class Hopital(models.Model):
     """Etablissement hospitalier enregistrant les naissances."""
     nom = models.CharField(max_length=200, verbose_name="Nom de l'hopital")
@@ -149,7 +176,8 @@ class DeclarationNaissance(models.Model):
         return f"{self.prenom_enfant} {self.nom_enfant}".strip()
 
 
-class ActeNaissance(models.Model):
+class ActeNaissance(_ActeNumberMixin, models.Model):
+    ACT_NUMBER_PREFIX = 'ACT'
     declaration = models.OneToOneField(DeclarationNaissance, on_delete=models.CASCADE, related_name='acte', verbose_name='Declaration associee')
     numero_acte = models.CharField(max_length=30, unique=True, verbose_name="Numero d'acte")
     date_generation = models.DateTimeField(auto_now_add=True, verbose_name='Date de generation')
@@ -164,16 +192,7 @@ class ActeNaissance(models.Model):
         return f"Acte N{self.numero_acte} - {self.declaration.nom_complet_enfant}"
 
     def save(self, *args, **kwargs):
-        # Génère un numéro d'acte unique robuste (avec tentative de collision contrôlée).
-        if not self.numero_acte:
-            year = timezone.now().year
-            for _ in range(5):
-                candidate = f"ACT-{year}-{uuid.uuid4().hex[:8].upper()}"
-                if not ActeNaissance.objects.filter(numero_acte=candidate).exists():
-                    self.numero_acte = candidate
-                    break
-            if not self.numero_acte:
-                self.numero_acte = f"ACT-{year}-{uuid.uuid4().hex[:12].upper()}"
+        self._ensure_numero_acte()
         super().save(*args, **kwargs)
 
 
@@ -251,7 +270,8 @@ class DeclarationMariage(models.Model):
             raise ValidationError(errors)
 
 
-class ActeMariage(models.Model):
+class ActeMariage(_ActeNumberMixin, models.Model):
+    ACT_NUMBER_PREFIX = 'ACTM'
     declaration = models.OneToOneField(DeclarationMariage, on_delete=models.CASCADE, related_name='acte', verbose_name='Declaration associee')
     numero_acte = models.CharField(max_length=30, unique=True, verbose_name="Numero d'acte")
     date_generation = models.DateTimeField(auto_now_add=True, verbose_name='Date de generation')
@@ -266,9 +286,7 @@ class ActeMariage(models.Model):
         return f"Acte mariage N{self.numero_acte}"
 
     def save(self, *args, **kwargs):
-        if not self.numero_acte:
-            year = timezone.now().year
-            self.numero_acte = f"ACTM-{year}-{uuid.uuid4().hex[:8].upper()}"
+        self._ensure_numero_acte()
         super().save(*args, **kwargs)
 
 
@@ -347,7 +365,8 @@ class DeclarationDeces(models.Model):
         return f"{self.prenom_defunt} {self.nom_defunt}".strip()
 
 
-class ActeDeces(models.Model):
+class ActeDeces(_ActeNumberMixin, models.Model):
+    ACT_NUMBER_PREFIX = 'ACTD'
     declaration = models.OneToOneField(DeclarationDeces, on_delete=models.CASCADE, related_name='acte', verbose_name='Declaration associee')
     numero_acte = models.CharField(max_length=30, unique=True, verbose_name="Numero d'acte")
     date_generation = models.DateTimeField(auto_now_add=True, verbose_name='Date de generation')
@@ -362,9 +381,7 @@ class ActeDeces(models.Model):
         return f"Acte deces N{self.numero_acte}"
 
     def save(self, *args, **kwargs):
-        if not self.numero_acte:
-            year = timezone.now().year
-            self.numero_acte = f"ACTD-{year}-{uuid.uuid4().hex[:8].upper()}"
+        self._ensure_numero_acte()
         super().save(*args, **kwargs)
 
 

@@ -15,6 +15,7 @@ urlpatterns = [
     path('dashboard/hopital/', views.dashboard_hopital, name='dashboard_hopital'),
     path('dashboard/mairie/', views.dashboard_mairie, name='dashboard_mairie'),
     path('dashboard/admin/', views.dashboard_admin, name='dashboard_admin'),
+    path('dashboard/anti-doublons/', views.duplicates_dashboard, name='duplicates_dashboard'),
 
     # Declarations CRUD
     path('declarations/', views.declaration_list, name='declaration_list'),
