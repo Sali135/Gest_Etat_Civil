@@ -70,6 +70,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     # Chaîne middleware standard Django.
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -140,6 +141,14 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STORAGES = {
+    # Stockage média (upload) standard sur le filesystem.
+    'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+    # Stockage static compressé, servi par WhiteNoise en production.
+    'staticfiles': {'BACKEND': 'whitenoise.storage.CompressedStaticFilesStorage'},
+}
+# Permet à WhiteNoise de retrouver les fichiers statiques même sans collectstatic.
+WHITENOISE_USE_FINDERS = True
 
 # Fichiers médias téléversés (PDF, etc.).
 MEDIA_URL = '/media/'
