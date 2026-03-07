@@ -33,17 +33,24 @@ def _env_csv(name, default=''):
     return [item.strip() for item in value.split(',') if item.strip()]
 
 
+def _append_unique(items, value):
+    # Ajoute une valeur dans une liste seulement si absente.
+    if value and value not in items:
+        items.append(value)
+
+
 DEBUG = _env_bool('DJANGO_DEBUG', default=True)
 
 # Hôtes autorisés (liste séparée par virgules en environnement).
-ALLOWED_HOSTS = [
-    host.strip()
-    for host in os.getenv('DJANGO_ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
-    if host.strip()
-]
+ALLOWED_HOSTS = _env_csv('DJANGO_ALLOWED_HOSTS', '127.0.0.1,localhost')
+_render_external_hostname = os.getenv('RENDER_EXTERNAL_HOSTNAME', '').strip()
+if _render_external_hostname:
+    _append_unique(ALLOWED_HOSTS, _render_external_hostname)
 
 # Origines fiables pour formulaires CSRF (utile derrière reverse proxy).
 CSRF_TRUSTED_ORIGINS = _env_csv('DJANGO_CSRF_TRUSTED_ORIGINS', '')
+if _render_external_hostname:
+    _append_unique(CSRF_TRUSTED_ORIGINS, f"https://{_render_external_hostname}")
 
 INSTALLED_APPS = [
     # Apps natives Django.
@@ -184,6 +191,10 @@ ADMIN_ALERT_EMAILS = _env_csv('DJANGO_ADMIN_ALERT_EMAILS', '')
 
 # Durcissement sécurité HTTP en environnement non-debug.
 # En développement local, ces protections restent désactivées par défaut.
+USE_X_FORWARDED_HOST = _env_bool('DJANGO_USE_X_FORWARDED_HOST', default=not DEBUG)
+if _env_bool('DJANGO_USE_X_FORWARDED_PROTO', default=not DEBUG):
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 SECURE_SSL_REDIRECT = _env_bool('DJANGO_SECURE_SSL_REDIRECT', default=not DEBUG)
 SESSION_COOKIE_SECURE = _env_bool('DJANGO_SESSION_COOKIE_SECURE', default=not DEBUG)
 CSRF_COOKIE_SECURE = _env_bool('DJANGO_CSRF_COOKIE_SECURE', default=not DEBUG)
