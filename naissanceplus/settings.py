@@ -76,6 +76,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'naissanceplus.middleware.AgentationDjangoMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
@@ -177,6 +178,16 @@ REST_FRAMEWORK = {
     # Pagination standard pour éviter de grosses réponses.
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
+}
+
+# Agentation.dev (toolbar d'assistance visuelle pour prototypage).
+AGENTATION_CONFIG = {
+    'enabled': _env_bool('AGENTATION_ENABLED', default=DEBUG),
+    'default_detail': os.getenv('AGENTATION_DEFAULT_DETAIL', 'standard'),
+    'default_format': os.getenv('AGENTATION_DEFAULT_FORMAT', 'markdown'),
+    'position': os.getenv('AGENTATION_POSITION', 'bottom-right'),
+    'theme': os.getenv('AGENTATION_THEME', 'auto'),
+    'block_interactions': _env_bool('AGENTATION_BLOCK_INTERACTIONS', default=True),
 }
 
 # Email configuration (console backend for development)
