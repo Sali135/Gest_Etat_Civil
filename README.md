@@ -104,13 +104,6 @@ docker compose down
 docker compose down -v   # supprime aussi les volumes (base de données incluse)
 ```
 
-### Agentation.dev (intégré au projet)
-- Le middleware Django est déjà branché.
-- Activez/désactivez via `.env`:
-  - `AGENTATION_ENABLED=True|False`
-  - `AGENTATION_POSITION=bottom-right|bottom-left|top-right|top-left`
-  - `AGENTATION_THEME=auto|light|dark`
-
 ---
 
 ## Comptes de démonstration (après `seed_demo`)
