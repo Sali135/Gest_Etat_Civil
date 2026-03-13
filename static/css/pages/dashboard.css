@@ -312,6 +312,15 @@
   letter-spacing: 0.06em;
 }
 
+.dashboard-filter-group .select,
+.dashboard-filter-group .form-select {
+  min-height: 38px;
+}
+
+.dashboard-filter-form .btn {
+  min-height: 38px;
+}
+
 .dashboard-admin-content,
 .dashboard-section-content {
   display: grid;

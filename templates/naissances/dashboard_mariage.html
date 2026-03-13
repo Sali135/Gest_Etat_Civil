@@ -5,10 +5,10 @@
 {% block page_subtitle %}Suivi des actes de mariage{% endblock %}
 
 {% block header_actions %}
-<a href="{% url 'naissances:mariage_create' %}" class="btn btn-primary btn-sm">
+<a href="{% url 'naissances:mariage_create' %}" class="btn btn-primary btn-sm normal-case">
   <i class="bi bi-plus-circle-fill"></i> Nouveau mariage
 </a>
-<a href="{% url 'naissances:mariage_list' %}" class="btn btn-outline-secondary btn-sm">
+<a href="{% url 'naissances:mariage_list' %}" class="btn btn-outline btn-sm">
   <i class="bi bi-list"></i> Liste complète
 </a>
 {% endblock %}
@@ -24,7 +24,7 @@
       </div>
 
       <form id="mariageDashboardFilters"
-            class="header-filter-form dashboard-filter-form"
+            class="header-filter-form dashboard-filter-form card bg-base-100 border border-base-300 shadow-sm p-3"
             hx-get="{% url 'naissances:mariage_dashboard' %}"
             hx-target="#dashboard-mariage-content"
             hx-swap="outerHTML"
@@ -33,7 +33,7 @@
             hx-trigger="change from:select delay:200ms, submit">
         <div class="dashboard-filter-group">
           <label class="form-label mb-1" for="mariage-dashboard-period">Période</label>
-          <select id="mariage-dashboard-period" class="form-select form-select-sm" name="periode">
+          <select id="mariage-dashboard-period" class="select select-bordered select-sm w-full" name="periode">
             {% for value, label in period_options %}
             <option value="{{ value }}" {% if filters.periode == value %}selected{% endif %}>{{ label }}</option>
             {% endfor %}
@@ -42,18 +42,18 @@
 
         <div class="dashboard-filter-group">
           <label class="form-label mb-1" for="mariage-dashboard-limit">Lignes récentes</label>
-          <select id="mariage-dashboard-limit" class="form-select form-select-sm" name="limite">
+          <select id="mariage-dashboard-limit" class="select select-bordered select-sm w-full" name="limite">
             {% for value in limit_options %}
             <option value="{{ value }}" {% if filters.limite == value %}selected{% endif %}>{{ value }}</option>
             {% endfor %}
           </select>
         </div>
 
-        <button type="submit" class="btn btn-primary btn-sm">
+        <button type="submit" class="btn btn-primary btn-sm normal-case">
           <i class="bi bi-arrow-repeat me-1"></i>Actualiser
         </button>
         <span id="dashboard-mariage-loader" class="dashboard-inline-loader htmx-indicator" aria-live="polite">
-          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          <span class="loading loading-spinner loading-xs"></span>
           Mise a jour...
         </span>
       </form>
@@ -63,3 +63,4 @@
   {% include 'naissances/partials/dashboard_mariage_content.html' %}
 </div>
 {% endblock %}
+

@@ -11,20 +11,20 @@ from .models import CustomUser
 
 class LoginForm(AuthenticationForm):
     """Formulaire de connexion personnalisé."""
-    # Champ username re-stylé pour Bootstrap.
+    # Champ username stylé pour Bootstrap + daisyUI.
     username = forms.CharField(
         label='Nom d\'utilisateur',
         widget=forms.TextInput(attrs={
-            'class': 'form-control form-control-lg',
+            'class': 'input input-bordered w-full form-control form-control-lg',
             'placeholder': 'Nom d\'utilisateur',
             'autofocus': True,
         })
     )
-    # Champ mot de passe re-stylé pour Bootstrap.
+    # Champ mot de passe stylé pour Bootstrap + daisyUI.
     password = forms.CharField(
         label='Mot de passe',
         widget=forms.PasswordInput(attrs={
-            'class': 'form-control form-control-lg',
+            'class': 'input input-bordered w-full form-control form-control-lg',
             'placeholder': 'Mot de passe',
         })
     )

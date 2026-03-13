@@ -5,10 +5,10 @@
 {% block page_subtitle %}{{ mairie.nom|default:"Mairie" }} — Gestion des déclarations reçues{% endblock %}
 
 {% block header_actions %}
-<a href="{% url 'naissances:declaration_list' %}?statut=EN_ATTENTE" class="btn btn-primary btn-sm">
+<a href="{% url 'naissances:declaration_list' %}?statut=EN_ATTENTE" class="btn btn-primary btn-sm normal-case">
   <i class="bi bi-inbox-fill"></i> Dossiers en attente
   {% if stats.en_attente > 0 %}
-  <span class="badge bg-warning text-dark ms-1">{{ stats.en_attente }}</span>
+  <span class="badge badge-warning ms-1">{{ stats.en_attente }}</span>
   {% endif %}
 </a>
 {% endblock %}
@@ -24,7 +24,7 @@
       </div>
 
       <form id="mairieDashboardFilters"
-            class="header-filter-form dashboard-filter-form"
+            class="header-filter-form dashboard-filter-form card bg-base-100 border border-base-300 shadow-sm p-3"
             hx-get="{% url 'naissances:dashboard_mairie' %}"
             hx-target="#dashboard-mairie-content"
             hx-swap="outerHTML"
@@ -33,7 +33,7 @@
             hx-trigger="change from:select delay:200ms, submit">
         <div class="dashboard-filter-group">
           <label class="form-label mb-1" for="mairie-dashboard-period">Période</label>
-          <select id="mairie-dashboard-period" class="form-select form-select-sm" name="periode">
+          <select id="mairie-dashboard-period" class="select select-bordered select-sm w-full" name="periode">
             {% for value, label in period_options %}
             <option value="{{ value }}" {% if filters.periode == value %}selected{% endif %}>{{ label }}</option>
             {% endfor %}
@@ -42,18 +42,18 @@
 
         <div class="dashboard-filter-group">
           <label class="form-label mb-1" for="mairie-dashboard-limit">Taille de la file</label>
-          <select id="mairie-dashboard-limit" class="form-select form-select-sm" name="limite">
+          <select id="mairie-dashboard-limit" class="select select-bordered select-sm w-full" name="limite">
             {% for value in limit_options %}
             <option value="{{ value }}" {% if filters.limite == value %}selected{% endif %}>{{ value }}</option>
             {% endfor %}
           </select>
         </div>
 
-        <button type="submit" class="btn btn-primary btn-sm">
+        <button type="submit" class="btn btn-primary btn-sm normal-case">
           <i class="bi bi-arrow-repeat me-1"></i>Actualiser
         </button>
         <span id="dashboard-mairie-loader" class="dashboard-inline-loader htmx-indicator" aria-live="polite">
-          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          <span class="loading loading-spinner loading-xs"></span>
           Mise a jour...
         </span>
       </form>
@@ -63,3 +63,4 @@
   {% include 'naissances/partials/dashboard_mairie_content.html' %}
 </div>
 {% endblock %}
+

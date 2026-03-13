@@ -31,6 +31,16 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
+### 4.b Frontend (Tailwind + daisyUI)
+```bash
+npm install
+npm run build:css
+```
+> Option dev (watch):
+```bash
+npm run watch:css
+```
+
 ### 5. Appliquer les migrations
 ```bash
 python manage.py migrate

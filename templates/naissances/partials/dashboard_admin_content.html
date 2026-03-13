@@ -1,5 +1,5 @@
 <div id="dashboard-admin-content" class="dashboard-admin-content">
-  <section class="hero-strip">
+  <section class="hero-strip card bg-base-100 border border-base-300 shadow-sm">
     <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
       <div>
         <div class="hero-kicker">Vue Administration</div>
@@ -16,63 +16,63 @@
 
   <div class="row g-4 kpi-grid">
     <div class="col-sm-6 col-xl-3">
-      <div class="stat-card primary">
+      <div class="stat-card primary card bg-base-100 border border-base-300 shadow-sm">
         <div class="stat-card-icon"><i class="bi bi-file-earmark-text-fill"></i></div>
         <div class="stat-value">{{ stats.total }}</div>
         <div class="stat-label">Total déclarations</div>
       </div>
     </div>
     <div class="col-sm-6 col-xl-3">
-      <div class="stat-card warning">
+      <div class="stat-card warning card bg-base-100 border border-base-300 shadow-sm">
         <div class="stat-card-icon"><i class="bi bi-hourglass-split"></i></div>
         <div class="stat-value">{{ stats.en_attente }}</div>
         <div class="stat-label">En attente</div>
       </div>
     </div>
     <div class="col-sm-6 col-xl-3">
-      <div class="stat-card success">
+      <div class="stat-card success card bg-base-100 border border-base-300 shadow-sm">
         <div class="stat-card-icon"><i class="bi bi-check-circle-fill"></i></div>
         <div class="stat-value">{{ stats.valides }}</div>
         <div class="stat-label">Validées</div>
       </div>
     </div>
     <div class="col-sm-6 col-xl-3">
-      <div class="stat-card danger">
+      <div class="stat-card danger card bg-base-100 border border-base-300 shadow-sm">
         <div class="stat-card-icon"><i class="bi bi-x-circle-fill"></i></div>
         <div class="stat-value">{{ stats.rejetes }}</div>
         <div class="stat-label">Rejetées</div>
       </div>
     </div>
     <div class="col-sm-6 col-xl-3">
-      <div class="stat-card teal">
+      <div class="stat-card teal card bg-base-100 border border-base-300 shadow-sm">
         <div class="stat-card-icon"><i class="bi bi-hospital-fill"></i></div>
         <div class="stat-value">{{ stats.hopitaux }}</div>
         <div class="stat-label">Hôpitaux</div>
       </div>
     </div>
     <div class="col-sm-6 col-xl-3">
-      <div class="stat-card info">
+      <div class="stat-card info card bg-base-100 border border-base-300 shadow-sm">
         <div class="stat-card-icon"><i class="bi bi-building-fill"></i></div>
         <div class="stat-value">{{ stats.mairies }}</div>
         <div class="stat-label">Mairies</div>
       </div>
     </div>
     <div class="col-sm-6 col-xl-3">
-      <div class="stat-card success">
+      <div class="stat-card success card bg-base-100 border border-base-300 shadow-sm">
         <div class="stat-card-icon"><i class="bi bi-heart-fill"></i></div>
         <div class="stat-value">{{ stats.mariages }}</div>
         <div class="stat-label">Mariages</div>
       </div>
     </div>
     <div class="col-sm-6 col-xl-3">
-      <div class="stat-card danger">
+      <div class="stat-card danger card bg-base-100 border border-base-300 shadow-sm">
         <div class="stat-card-icon"><i class="bi bi-file-earmark-x-fill"></i></div>
         <div class="stat-value">{{ stats.deces }}</div>
         <div class="stat-label">Décès</div>
       </div>
     </div>
     <div class="col-sm-6 col-xl-3">
-      <div class="stat-card warning">
+      <div class="stat-card warning card bg-base-100 border border-base-300 shadow-sm">
         <div class="stat-card-icon"><i class="bi bi-alarm-fill"></i></div>
         <div class="stat-value">{{ stats.en_retard }}</div>
         <div class="stat-label">Naissances en retard</div>
@@ -82,7 +82,7 @@
 
   <div class="row g-4">
     <div class="col-lg-4">
-      <div class="card h-100 dashboard-card">
+      <div class="card h-100 dashboard-card bg-base-100 border border-base-300 shadow-sm">
         <div class="card-header">
           <h5><i class="bi bi-pie-chart-fill me-2"></i>Repartition des statuts</h5>
         </div>
@@ -92,7 +92,7 @@
       </div>
     </div>
     <div class="col-lg-8">
-      <div class="card h-100 dashboard-card">
+      <div class="card h-100 dashboard-card bg-base-100 border border-base-300 shadow-sm">
         <div class="card-header">
           <h5><i class="bi bi-bar-chart-fill me-2"></i>Performance par hopital</h5>
         </div>
@@ -105,14 +105,14 @@
 
   <div class="row g-4">
     <div class="col-lg-6">
-      <div class="card h-100 dashboard-card">
+      <div class="card h-100 dashboard-card bg-base-100 border border-base-300 shadow-sm">
         <div class="card-header">
           <h5><i class="bi bi-hospital-fill me-2"></i>Activite par hopital</h5>
         </div>
         <div class="card-body p-0">
           {% if hopitaux_stats %}
           <div class="table-shell elevated">
-            <table class="table-modern w-100">
+            <table class="table-modern table table-zebra w-100">
               <thead>
                 <tr>
                   <th>Hôpital</th>
@@ -155,15 +155,15 @@
     </div>
 
     <div class="col-lg-6">
-      <div class="card h-100 dashboard-card">
+      <div class="card h-100 dashboard-card bg-base-100 border border-base-300 shadow-sm">
         <div class="card-header">
           <h5><i class="bi bi-clock-history me-2"></i>Activite recente</h5>
-          <a href="{% url 'naissances:declaration_list' %}" class="btn btn-outline-secondary btn-sm">Voir tout</a>
+          <a href="{% url 'naissances:declaration_list' %}" class="btn btn-outline btn-sm">Voir tout</a>
         </div>
         <div class="card-body p-0">
           {% if recent %}
           <div class="table-shell elevated">
-            <table class="table-modern w-100">
+            <table class="table-modern table table-zebra w-100">
               <thead>
                 <tr>
                   <th>Référence</th>
@@ -182,7 +182,7 @@
                   </td>
                   <td><span class="fw-semibold">{{ d.nom_enfant }}</span></td>
                   <td>
-                    <span class="badge-status {{ d.statut|lower|cut:'_' }}">
+                    <span class="badge-status badge {{ d.statut|lower|cut:'_' }}">
                       {% if d.statut == 'EN_ATTENTE' %}
                       <i class="bi bi-hourglass-split me-1"></i>
                       {% elif d.statut == 'EN_VERIFICATION' %}
@@ -214,3 +214,4 @@
 
   {{ chart_payload|json_script:"dashboard-admin-chart-data" }}
 </div>
+

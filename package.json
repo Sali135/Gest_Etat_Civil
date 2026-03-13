@@ -1,0 +1,29 @@
+{
+  "name": "abdoul1",
+  "version": "1.0.0",
+  "description": "**Plateforme de gestion des déclarations de naissance**",
+  "main": "index.js",
+  "scripts": {
+    "build:css": "tailwindcss -i ./static/css/tailwind.input.css -o ./static/css/daisyui.css --minify",
+    "watch:css": "tailwindcss -i ./static/css/tailwind.input.css -o ./static/css/daisyui.css --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sali135/Gest_Etat_Civil.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Sali135/Gest_Etat_Civil/issues"
+  },
+  "homepage": "https://github.com/Sali135/Gest_Etat_Civil#readme",
+  "devDependencies": {
+    "autoprefixer": "^10.4.27",
+    "daisyui": "^4.12.24",
+    "postcss": "^8.5.8",
+    "tailwindcss": "^3.4.17"
+  }
+}

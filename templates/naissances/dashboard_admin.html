@@ -5,7 +5,7 @@
 {% block page_subtitle %}Vue d'ensemble du système de Gestion des actes d'etat civil{% endblock %}
 
 {% block header_actions %}
-<a href="/admin/" class="btn btn-primary btn-sm">
+<a href="/admin/" class="btn btn-primary btn-sm normal-case">
   <i class="bi bi-shield-fill-check me-1"></i>Interface Admin
 </a>
 {% endblock %}
@@ -21,7 +21,7 @@
       </div>
 
       <form id="adminDashboardFilters"
-            class="header-filter-form dashboard-filter-form"
+            class="header-filter-form dashboard-filter-form card bg-base-100 border border-base-300 shadow-sm p-3"
             hx-get="{% url 'naissances:dashboard_admin' %}"
             hx-target="#dashboard-admin-content"
             hx-swap="outerHTML"
@@ -30,7 +30,7 @@
             hx-trigger="change from:select delay:200ms, submit">
         <div class="dashboard-filter-group">
           <label class="form-label mb-1" for="dashboard-period">Période</label>
-          <select id="dashboard-period" class="form-select form-select-sm" name="periode">
+          <select id="dashboard-period" class="select select-bordered select-sm w-full" name="periode">
             {% for value, label in period_options %}
             <option value="{{ value }}" {% if filters.periode == value %}selected{% endif %}>{{ label }}</option>
             {% endfor %}
@@ -39,18 +39,18 @@
 
         <div class="dashboard-filter-group">
           <label class="form-label mb-1" for="dashboard-limit">Lignes récentes</label>
-          <select id="dashboard-limit" class="form-select form-select-sm" name="limite">
+          <select id="dashboard-limit" class="select select-bordered select-sm w-full" name="limite">
             {% for value in limit_options %}
             <option value="{{ value }}" {% if filters.limite == value %}selected{% endif %}>{{ value }}</option>
             {% endfor %}
           </select>
         </div>
 
-        <button type="submit" class="btn btn-primary btn-sm">
+        <button type="submit" class="btn btn-primary btn-sm normal-case">
           <i class="bi bi-arrow-repeat me-1"></i>Actualiser
         </button>
         <span id="dashboard-admin-loader" class="dashboard-inline-loader htmx-indicator" aria-live="polite">
-          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          <span class="loading loading-spinner loading-xs"></span>
           Mise a jour...
         </span>
       </form>
@@ -205,3 +205,4 @@
   })();
 </script>
 {% endblock %}
+

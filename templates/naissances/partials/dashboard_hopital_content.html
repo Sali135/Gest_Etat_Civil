@@ -1,5 +1,5 @@
 <div id="dashboard-hopital-content" class="dashboard-section-content">
-  <section class="hero-strip">
+  <section class="hero-strip card bg-base-100 border border-base-300 shadow-sm">
     <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
       <div>
         <div class="hero-kicker">Espace Hopital</div>
@@ -16,35 +16,35 @@
 
   <div class="row g-4 kpi-grid">
     <div class="col-sm-6 col-xl-3">
-      <div class="stat-card primary">
+      <div class="stat-card primary card bg-base-100 border border-base-300 shadow-sm">
         <div class="stat-card-icon"><i class="bi bi-file-earmark-text-fill"></i></div>
         <div class="stat-value">{{ stats.total }}</div>
         <div class="stat-label">Total déclarations</div>
       </div>
     </div>
     <div class="col-sm-6 col-xl-3">
-      <div class="stat-card warning">
+      <div class="stat-card warning card bg-base-100 border border-base-300 shadow-sm">
         <div class="stat-card-icon"><i class="bi bi-hourglass-split"></i></div>
         <div class="stat-value">{{ stats.en_attente }}</div>
         <div class="stat-label">En attente</div>
       </div>
     </div>
     <div class="col-sm-6 col-xl-3">
-      <div class="stat-card success">
+      <div class="stat-card success card bg-base-100 border border-base-300 shadow-sm">
         <div class="stat-card-icon"><i class="bi bi-check-circle-fill"></i></div>
         <div class="stat-value">{{ stats.valides }}</div>
         <div class="stat-label">Validées</div>
       </div>
     </div>
     <div class="col-sm-6 col-xl-3">
-      <div class="stat-card danger">
+      <div class="stat-card danger card bg-base-100 border border-base-300 shadow-sm">
         <div class="stat-card-icon"><i class="bi bi-x-circle-fill"></i></div>
         <div class="stat-value">{{ stats.rejetes }}</div>
         <div class="stat-label">Rejetées</div>
       </div>
     </div>
     <div class="col-sm-6 col-xl-3">
-      <div class="stat-card warning">
+      <div class="stat-card warning card bg-base-100 border border-base-300 shadow-sm">
         <div class="stat-card-icon"><i class="bi bi-alarm-fill"></i></div>
         <div class="stat-value">{{ stats.en_retard }}</div>
         <div class="stat-label">Dossiers en retard</div>
@@ -53,7 +53,7 @@
   </div>
 
   {% if stats.total > 0 %}
-  <div class="card dashboard-card">
+  <div class="card dashboard-card bg-base-100 border border-base-300 shadow-sm">
     <div class="card-body">
       <div class="d-flex justify-content-between align-items-center mb-2">
         <span class="metric-meta">Taux de validation</span>
@@ -66,17 +66,17 @@
   </div>
   {% endif %}
 
-  <div class="card dashboard-card">
+  <div class="card dashboard-card bg-base-100 border border-base-300 shadow-sm">
     <div class="card-header">
       <h5><i class="bi bi-clock-history me-2"></i>Declarations recentes</h5>
-      <a href="{% url 'naissances:declaration_list' %}" class="btn btn-outline-secondary btn-sm">
+      <a href="{% url 'naissances:declaration_list' %}" class="btn btn-outline btn-sm">
         Voir tout <i class="bi bi-arrow-right ms-1"></i>
       </a>
     </div>
     <div class="card-body p-0">
       {% if recent %}
       <div class="table-shell elevated">
-        <table class="table-modern w-100">
+        <table class="table-modern table table-zebra w-100">
           <thead>
             <tr>
               <th>Référence</th>
@@ -98,7 +98,7 @@
               <td>{{ d.date_naissance|date:"d/m/Y" }}</td>
               <td>{{ d.mairie.nom }}</td>
               <td>
-                <span class="badge-status {{ d.statut|lower|cut:'_' }}">
+                <span class="badge-status badge {{ d.statut|lower|cut:'_' }}">
                   {% if d.statut == 'EN_ATTENTE' %}
                   <i class="bi bi-hourglass-split me-1"></i>
                   {% elif d.statut == 'EN_VERIFICATION' %}
@@ -112,7 +112,7 @@
                 </span>
               </td>
               <td>
-                <a href="{% url 'naissances:declaration_detail' d.pk %}" class="btn btn-outline-secondary btn-sm">
+                <a href="{% url 'naissances:declaration_detail' d.pk %}" class="btn btn-outline btn-sm">
                   <i class="bi bi-eye"></i>
                 </a>
               </td>
@@ -126,7 +126,7 @@
         <div class="empty-state-icon"><i class="bi bi-clipboard-data"></i></div>
         <h5>Aucune déclaration</h5>
         <p>Commencez par enregistrer une nouvelle naissance.</p>
-        <a href="{% url 'naissances:declaration_create' %}" class="btn btn-primary mt-3">
+        <a href="{% url 'naissances:declaration_create' %}" class="btn btn-primary mt-3 normal-case">
           <i class="bi bi-plus-circle-fill me-2"></i>Nouvelle déclaration
         </a>
       </div>
@@ -134,3 +134,4 @@
     </div>
   </div>
 </div>
+

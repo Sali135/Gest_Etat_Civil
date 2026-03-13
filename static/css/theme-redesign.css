@@ -75,8 +75,8 @@ body {
 }
 
 .sidebar-footer {
-  position: sticky;
-  bottom: 0;
+  position: relative;
+  bottom: auto;
   background: rgba(9, 22, 34, 0.45);
 }
 
@@ -339,41 +339,6 @@ body {
 .confirm-modal {
   border-radius: 16px;
   border: 1px solid #d6e2ee;
-}
-
-/* Login redesign */
-.auth-page {
-  background:
-    radial-gradient(circle at 12% 12%, rgba(41, 133, 183, 0.2), transparent 34%),
-    radial-gradient(circle at 88% 12%, rgba(173, 123, 56, 0.2), transparent 30%),
-    radial-gradient(circle at 80% 88%, rgba(45, 124, 86, 0.18), transparent 34%),
-    linear-gradient(180deg, #f7fbff 0%, #eef5fc 100%);
-}
-
-.auth-frame {
-  border-radius: 32px;
-  border: 1px solid #d4e2ef;
-  box-shadow: 0 32px 72px rgba(19, 49, 73, 0.18);
-}
-
-.auth-left {
-  background: linear-gradient(158deg, #123b5a 0%, #1f5f88 48%, #2f87b8 100%);
-}
-
-.auth-right {
-  background: linear-gradient(180deg, #ffffff 0%, #f4f9ff 100%);
-}
-
-.auth-login-head {
-  gap: 14px;
-}
-
-.auth-submit {
-  background: linear-gradient(136deg, #155f89 0%, #2884b5 100%);
-}
-
-.demo-account-btn {
-  border-color: #d1e0ee;
 }
 
 /* Public home redesign */

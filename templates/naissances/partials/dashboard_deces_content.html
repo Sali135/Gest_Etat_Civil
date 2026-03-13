@@ -1,5 +1,5 @@
 <div id="dashboard-deces-content" class="dashboard-section-content">
-  <section class="hero-strip">
+  <section class="hero-strip card bg-base-100 border border-base-300 shadow-sm">
     <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
       <div>
         <div class="hero-kicker">Etat Civil Deces</div>
@@ -16,49 +16,49 @@
 
   <div class="row g-4 kpi-grid">
     <div class="col-sm-6 col-xl-4">
-      <div class="stat-card danger">
+      <div class="stat-card danger card bg-base-100 border border-base-300 shadow-sm">
         <div class="stat-card-icon"><i class="bi bi-file-earmark-x-fill"></i></div>
         <div class="stat-value">{{ stats.total }}</div>
         <div class="stat-label">Total déclarations</div>
       </div>
     </div>
     <div class="col-sm-6 col-xl-4">
-      <div class="stat-card warning">
+      <div class="stat-card warning card bg-base-100 border border-base-300 shadow-sm">
         <div class="stat-card-icon"><i class="bi bi-calendar2-week-fill"></i></div>
         <div class="stat-value">{{ stats.ce_mois }}</div>
         <div class="stat-label">Ce mois</div>
       </div>
     </div>
     <div class="col-sm-6 col-xl-4">
-      <div class="stat-card info">
+      <div class="stat-card info card bg-base-100 border border-base-300 shadow-sm">
         <div class="stat-card-icon"><i class="bi bi-journal-medical"></i></div>
         <div class="stat-value">{{ stats.avec_cause }}</div>
         <div class="stat-label">Cause de décès renseignée</div>
       </div>
     </div>
     <div class="col-sm-6 col-xl-4">
-      <div class="stat-card warning">
+      <div class="stat-card warning card bg-base-100 border border-base-300 shadow-sm">
         <div class="stat-card-icon"><i class="bi bi-hourglass-split"></i></div>
         <div class="stat-value">{{ stats.en_attente }}</div>
         <div class="stat-label">En attente</div>
       </div>
     </div>
     <div class="col-sm-6 col-xl-4">
-      <div class="stat-card success">
+      <div class="stat-card success card bg-base-100 border border-base-300 shadow-sm">
         <div class="stat-card-icon"><i class="bi bi-check-circle-fill"></i></div>
         <div class="stat-value">{{ stats.valides }}</div>
         <div class="stat-label">Validés</div>
       </div>
     </div>
     <div class="col-sm-6 col-xl-4">
-      <div class="stat-card danger">
+      <div class="stat-card danger card bg-base-100 border border-base-300 shadow-sm">
         <div class="stat-card-icon"><i class="bi bi-x-circle-fill"></i></div>
         <div class="stat-value">{{ stats.rejetes }}</div>
         <div class="stat-label">Rejetés</div>
       </div>
     </div>
     <div class="col-sm-6 col-xl-4">
-      <div class="stat-card warning">
+      <div class="stat-card warning card bg-base-100 border border-base-300 shadow-sm">
         <div class="stat-card-icon"><i class="bi bi-alarm-fill"></i></div>
         <div class="stat-value">{{ stats.en_retard }}</div>
         <div class="stat-label">Dossiers en retard</div>
@@ -66,14 +66,14 @@
     </div>
   </div>
 
-  <div class="card dashboard-card">
+  <div class="card dashboard-card bg-base-100 border border-base-300 shadow-sm">
     <div class="card-header">
       <h5><i class="bi bi-clock-history me-2"></i>Décès récents</h5>
     </div>
     <div class="card-body p-0">
       {% if recent %}
       <div class="table-shell elevated">
-        <table class="table-modern w-100">
+        <table class="table-modern table table-zebra w-100">
           <thead>
             <tr>
               <th>Référence</th>
@@ -92,7 +92,7 @@
               <td>{{ d.date_deces|date:"d/m/Y" }}</td>
               <td>{{ d.lieu_deces }}</td>
               <td>{{ d.mairie.nom }}</td>
-              <td><span class="badge-status {{ d.statut|lower|cut:'_' }}">{{ d.get_statut_display }}</span></td>
+              <td><span class="badge-status badge {{ d.statut|lower|cut:'_' }}">{{ d.get_statut_display }}</span></td>
             </tr>
             {% endfor %}
           </tbody>
@@ -107,3 +107,4 @@
     </div>
   </div>
 </div>
+

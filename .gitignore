@@ -16,6 +16,8 @@ staticfiles/
 # Tooling / IDE
 .vscode/
 .idea/
+node_modules/
+.npm/
 
 # OS files
 .DS_Store
